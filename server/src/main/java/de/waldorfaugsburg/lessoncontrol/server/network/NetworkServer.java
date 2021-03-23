@@ -51,14 +51,15 @@ public final class NetworkServer {
 
     private void registerReceivers() {
         distributor.addReceiver(ClientRegisterPacket.class, (client, packet) -> {
-            if (packet.getProtocolVersion() != Network.PROTOCOL_VERSION) {
-                client.sendTCP(new ServerClientDenyPacket(ServerClientDenyPacket.Reason.OUTDATED_CLIENT, "Use: " + Network.PROTOCOL_VERSION));
+            client.setClientName(packet.getName());
+            client.setProtocolVersion(packet.getProtocolVersion());
+
+            if (client.getProtocolVersion() != Network.PROTOCOL_VERSION) {
+                client.sendTCP(new ServerClientDenyPacket(ServerClientDenyPacket.Reason.OUTDATED_CLIENT, "use " + Network.PROTOCOL_VERSION));
                 log.error("Denied {} due to unsupported protocol version! (PV: {})", client.getClientName(), client.getProtocolVersion());
                 return;
             }
 
-            client.setClientName(packet.getName());
-            client.setProtocolVersion(packet.getProtocolVersion());
             client.sendTCP(new ServerClientAcceptPacket());
             log.info("{} registered as {} (PV: {})", client.getHostString(), client.getClientName(), client.getProtocolVersion());
         });

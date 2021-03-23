@@ -52,6 +52,10 @@ public final class NetworkClient {
         if (skipAddress != null && addresses.size() == 1)
             skipAddress = null;
 
+        if (client.isConnected()) {
+            client.close();
+        }
+
         for (final String address : addresses) {
             if (skipAddress != null && skipAddress.equals(address)) {
                 log.info("Skipping {} ...", skipAddress);
@@ -91,6 +95,8 @@ public final class NetworkClient {
             changeState(NetworkState.DENIED);
             log.error("Denied by server {}! Reason: {}; Message: {}", lastAddress, packet.getReason(), packet.getMessage());
         });
+
+        addListener(state -> log.info("Network state: " + state));
     }
 
     private void changeState(final NetworkState state) {
@@ -118,5 +124,9 @@ public final class NetworkClient {
                 distributor.distribute(connection, packet);
             }
         }
+    }
+
+    public PacketDistributor<Connection> getDistributor() {
+        return distributor;
     }
 }

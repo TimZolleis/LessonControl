@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.stream.JsonReader;
 import de.waldorfaugsburg.lessoncontrol.client.config.ClientConfiguration;
 import de.waldorfaugsburg.lessoncontrol.client.network.NetworkClient;
+import de.waldorfaugsburg.lessoncontrol.client.tray.TrayManager;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.BufferedReader;
@@ -19,7 +20,9 @@ public final class LessonControlClientApplication {
 
     private String machineName;
     private ClientConfiguration configuration;
+
     private NetworkClient networkClient;
+    private TrayManager trayManager;
 
     public void enable() {
         try {
@@ -37,13 +40,13 @@ public final class LessonControlClientApplication {
 
         // Initialize services
         networkClient = new NetworkClient(this);
-        networkClient.addListener(System.out::println);
+        trayManager = new TrayManager(this);
 
         networkClient.connect();
     }
 
     public void disable() {
-
+        trayManager.disable();
     }
 
     public Gson getGson() {

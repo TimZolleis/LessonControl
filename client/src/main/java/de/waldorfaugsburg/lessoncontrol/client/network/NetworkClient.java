@@ -52,30 +52,37 @@ public final class NetworkClient {
         if (skipAddress != null && addresses.size() == 1)
             skipAddress = null;
 
-        if (client.isConnected()) {
-            client.close();
-        }
-
         for (final String address : addresses) {
             if (skipAddress != null && skipAddress.equals(address)) {
-                log.info("Skipping {} ...", skipAddress);
+                log.info("Skipping '{}' ...", skipAddress);
                 continue;
             }
 
             try {
+                final String[] splitAddress = address.split(":");
+                if (splitAddress.length == 1) {
+                    log.warn("Address '{}' invalidly formatted! (Port missing)", address);
+                    changeState(NetworkState.FATAL);
+                    continue;
+                }
+
                 changeState(NetworkState.CONNECTING);
-                client.connect(2000, address, application.getConfiguration().getPort());
+                client.connect(2000, splitAddress[0], Integer.parseInt(splitAddress[1]));
                 changeState(NetworkState.CONNECTED);
                 lastAddress = client.getRemoteAddressTCP().getHostString();
                 break;
+            } catch (final NumberFormatException e) {
+                log.error("Address '{}' invalidly formatted!", address, e);
+                changeState(NetworkState.FATAL);
             } catch (final IOException e) {
                 log.error("An error occurred while connecting to server", e);
+                changeState(NetworkState.FAILED);
             }
         }
 
-        if (!client.isConnected()) {
+        if (!client.isConnected() && state != NetworkState.FATAL) {
             // Retry connection if client isn't connected yet
-            connect(null);
+            Scheduler.runLater(this::connect, 1000);
         }
     }
 
@@ -92,8 +99,8 @@ public final class NetworkClient {
             changeState(NetworkState.READY);
         });
         distributor.addReceiver(ServerClientDenyPacket.class, (connection, packet) -> {
-            changeState(NetworkState.DENIED);
-            log.error("Denied by server {}! Reason: {}; Message: {}", lastAddress, packet.getReason(), packet.getMessage());
+            changeState(NetworkState.FATAL);
+            log.error("Denied by server '{}'! Reason: {}; Message: {}", lastAddress, packet.getReason(), packet.getMessage());
         });
 
         addListener(state -> log.info("Network state: " + state));
@@ -114,7 +121,7 @@ public final class NetworkClient {
 
         @Override
         public void disconnected(final Connection connection) {
-            if (state != NetworkState.DENIED) Scheduler.runLater(() -> connect(lastAddress), 1000);
+            if (state == NetworkState.READY) Scheduler.runLater(() -> connect(lastAddress), 1000);
         }
 
         @Override

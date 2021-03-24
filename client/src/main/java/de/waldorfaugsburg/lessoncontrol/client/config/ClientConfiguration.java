@@ -10,5 +10,4 @@ import java.util.List;
 @Getter
 public final class ClientConfiguration implements Serializable {
     private List<String> addresses;
-    private int port;
 }

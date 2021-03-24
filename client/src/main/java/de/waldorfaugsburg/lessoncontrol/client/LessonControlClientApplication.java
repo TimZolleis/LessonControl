@@ -46,7 +46,7 @@ public final class LessonControlClientApplication {
     }
 
     public void disable() {
-        trayManager.disable();
+
     }
 
     public Gson getGson() {

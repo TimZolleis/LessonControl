@@ -1,9 +1,9 @@
 package de.waldorfaugsburg.lessoncontrol.client.tray;
 
 import de.waldorfaugsburg.lessoncontrol.client.LessonControlClientApplication;
-import de.waldorfaugsburg.lessoncontrol.client.network.NetworkState;
 import lombok.extern.slf4j.Slf4j;
 
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -18,11 +18,11 @@ public final class TrayManager {
     public TrayManager(final LessonControlClientApplication application) {
         this.application = application;
 
-        initialize();
+        SwingUtilities.invokeLater(this::initialize);
     }
 
     private void initialize() {
-        final Image trayImage = Toolkit.getDefaultToolkit().createImage(getClass().getResource("/icon.png"));
+        final Image trayImage = Toolkit.getDefaultToolkit().createImage(getClass().getResource("/tray.png"));
         trayIcon = new TrayIcon(trayImage, "LessonControl");
         trayIcon.setImageAutoSize(true);
 
@@ -31,13 +31,7 @@ public final class TrayManager {
         statusItem.setEnabled(false);
         menu.add(statusItem);
         menu.addSeparator();
-        menu.add(createItem("Log anzeigen", e -> {
-            try {
-                Desktop.getDesktop().open(new File(System.getenv("APPDATA") + "/LessonControl/client.log"));
-            } catch (final IOException ex) {
-                log.error("An error occurred while opening log", ex);
-            }
-        }));
+        menu.add(createItem("Log anzeigen", e -> showLog()));
         menu.add(createItem("Erneut verbinden", e -> application.getNetworkClient().connect()));
         menu.add(createItem("Beenden", e -> System.exit(0)));
         trayIcon.setPopupMenu(menu);
@@ -48,21 +42,31 @@ public final class TrayManager {
             log.error("An error occurred while adding tray icon", e);
         }
 
-        application.getNetworkClient().addListener(state -> {
+        application.getNetworkClient().addListener(state -> SwingUtilities.invokeLater(() -> {
             statusItem.setLabel(state.getMessage());
             trayIcon.setToolTip("LessonControl\n" + state.getMessage());
-
-            if (state == NetworkState.READY) {
-                trayIcon.displayMessage("LessonControl", "Verbunden!", TrayIcon.MessageType.INFO);
-            } else if (state == NetworkState.FATAL) {
-                trayIcon.displayMessage("LessonControl", "Ein schwerwiegender Fehler ist aufgetreten!", TrayIcon.MessageType.NONE);
-            }
-        });
+        }));
     }
 
     private MenuItem createItem(final String label, final ActionListener listener) {
         final MenuItem item = new MenuItem(label);
         item.addActionListener(listener);
         return item;
+    }
+
+    private void showLog() {
+        final File file = application.getApplicationDirectoryFile("client.log");
+        if (file.exists()) {
+            try {
+                Desktop.getDesktop().open(file);
+            } catch (final IOException ex) {
+                JOptionPane.showMessageDialog(null, "Beim Öffnen der Logdatei ist ein Fehler aufgetreten!",
+                        "Logdatei öffnen", JOptionPane.ERROR_MESSAGE);
+                log.error("An error occurred while opening log", ex);
+            }
+        } else {
+            JOptionPane.showMessageDialog(null, "Keine Logdatei gefunden!",
+                    "Logdatei öffnen", JOptionPane.ERROR_MESSAGE);
+        }
     }
 }

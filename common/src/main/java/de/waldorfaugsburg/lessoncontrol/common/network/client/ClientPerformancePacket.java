@@ -1,4 +1,4 @@
-package de.waldorfaugsburg.lessoncontrol.common.network.server;
+package de.waldorfaugsburg.lessoncontrol.common.network.client;
 
 import de.waldorfaugsburg.lessoncontrol.common.network.Packet;
 import lombok.AllArgsConstructor;
@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
-public final class ServerTransferChunkPacket extends Packet {
-    private byte[] chunk;
-    private boolean lastChunk;
+public final class ClientPerformancePacket extends Packet {
+    private double cpuUsage;
+    private long usedMemory;
 }

@@ -3,6 +3,7 @@ package de.waldorfaugsburg.lessoncontrol.common.network;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryonet.EndPoint;
 import com.esotericsoftware.minlog.Log;
+import de.waldorfaugsburg.lessoncontrol.common.network.client.ClientPerformancePacket;
 import de.waldorfaugsburg.lessoncontrol.common.network.client.ClientRegisterPacket;
 import de.waldorfaugsburg.lessoncontrol.common.network.server.ServerClientAcceptPacket;
 import de.waldorfaugsburg.lessoncontrol.common.network.server.ServerClientDenyPacket;
@@ -23,6 +24,7 @@ public final class Network {
         final Kryo kryo = endPoint.getKryo();
         // Bound to client
         kryo.register(ClientRegisterPacket.class);
+        kryo.register(ClientPerformancePacket.class);
 
         // Bound to server
         kryo.register(ServerClientAcceptPacket.class);

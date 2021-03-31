@@ -3,11 +3,11 @@ package de.waldorfaugsburg.lessoncontrol.client.network;
 public enum NetworkState {
 
     CONNECTING("Verbinde ..."),
-    FAILED("Verbindung fehlgeschlagen!"),
+    FAILED("Fehlgeschlagen!"),
     CONNECTED("Verbunden!"),
     REGISTERED("Registriert!"),
     READY("Bereit!"),
-    FATAL("Schwerwiegender Fehler!");
+    ERROR("Fehler!");
 
     private final String message;
 

@@ -47,7 +47,15 @@ public final class NetworkClient {
         connect(null);
     }
 
+    public void sendPacket(final Packet packet) {
+        client.sendTCP(packet);
+    }
+
     private void connect(String skipAddress) {
+        // There is no need to connect if were already connected or in the urge of it
+        if (state == NetworkState.CONNECTED || state == NetworkState.CONNECTING)
+            return;
+
         final List<String> addresses = application.getConfiguration().getAddresses();
         if (skipAddress != null && addresses.size() == 1)
             skipAddress = null;
@@ -62,7 +70,7 @@ public final class NetworkClient {
                 final String[] splitAddress = address.split(":");
                 if (splitAddress.length == 1) {
                     log.warn("Address '{}' invalidly formatted! (Port missing)", address);
-                    changeState(NetworkState.FATAL);
+                    changeState(NetworkState.ERROR);
                     continue;
                 }
 
@@ -73,14 +81,14 @@ public final class NetworkClient {
                 break;
             } catch (final NumberFormatException e) {
                 log.error("Address '{}' invalidly formatted!", address, e);
-                changeState(NetworkState.FATAL);
+                changeState(NetworkState.ERROR);
             } catch (final IOException e) {
                 log.error("An error occurred while connecting to server", e);
                 changeState(NetworkState.FAILED);
             }
         }
 
-        if (!client.isConnected() && state != NetworkState.FATAL) {
+        if (!client.isConnected() && state != NetworkState.ERROR) {
             // Retry connection if client isn't connected yet
             Scheduler.runLater(this::connect, 1000);
         }
@@ -99,11 +107,11 @@ public final class NetworkClient {
             changeState(NetworkState.READY);
         });
         distributor.addReceiver(ServerClientDenyPacket.class, (connection, packet) -> {
-            changeState(NetworkState.FATAL);
+            changeState(NetworkState.ERROR);
             log.error("Denied by server '{}'! Reason: {}; Message: {}", lastAddress, packet.getReason(), packet.getMessage());
         });
 
-        addListener(state -> log.info("Network state: " + state));
+        addListener(state -> log.info("Network state is now '{}'", state));
     }
 
     private void changeState(final NetworkState state) {
@@ -115,7 +123,9 @@ public final class NetworkClient {
 
         @Override
         public void connected(final Connection connection) {
-            client.sendTCP(new ClientRegisterPacket(application.getMachineName(), Network.PROTOCOL_VERSION));
+            client.sendTCP(new ClientRegisterPacket(application.getMachineName(), Network.PROTOCOL_VERSION,
+                    application.getPerformanceManager().getProcessorCount(),
+                    application.getPerformanceManager().getTotalMemory()));
             changeState(NetworkState.REGISTERED);
         }
 
@@ -135,5 +145,9 @@ public final class NetworkClient {
 
     public PacketDistributor<Connection> getDistributor() {
         return distributor;
+    }
+
+    public NetworkState getState() {
+        return state;
     }
 }

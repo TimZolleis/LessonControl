@@ -4,11 +4,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.util.Map;
 
 @NoArgsConstructor
 @Getter
 public final class ServerConfiguration implements Serializable {
-
     private int port;
-
 }

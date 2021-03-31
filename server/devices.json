@@ -1,0 +1,14 @@
+{
+  "devices": [
+    {
+      "name": "FWAKlassenPC00",
+      "address": "192.168.53.60",
+      "group": "default"
+    },
+    {
+      "name": "DESKTOP-2TECB1V",
+      "address": "192.168.178.20",
+      "group": "default"
+    }
+  ]
+}

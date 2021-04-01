@@ -25,5 +25,4 @@ public final class SystemResourcesUtil {
     public static long getFreeMemory() {
         return SYSTEM_INFO.getHardware().getMemory().getAvailable();
     }
-
 }

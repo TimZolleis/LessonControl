@@ -5,7 +5,6 @@ public enum NetworkState {
     CONNECTING("Verbinde ..."),
     FAILED("Fehlgeschlagen!"),
     CONNECTED("Verbunden!"),
-    REGISTERED("Registriert!"),
     READY("Bereit!"),
     ERROR("Fehler!");
 

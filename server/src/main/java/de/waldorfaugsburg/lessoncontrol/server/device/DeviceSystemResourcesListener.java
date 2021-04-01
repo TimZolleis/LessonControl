@@ -19,6 +19,8 @@ public final class DeviceSystemResourcesListener {
     private void init() {
         networkServer.getDistributor().addReceiver(ClientSystemResourcesPacket.class, (connection, packet) -> {
             final Device device = connection.getDevice();
+            if (device == null) return;
+
             device.updateSystemResources(packet.getFreeMemory(), packet.getLoad());
         });
     }

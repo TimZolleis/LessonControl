@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ScheduledFuture;
 
 @Slf4j
 public final class NetworkClient {
@@ -29,7 +30,9 @@ public final class NetworkClient {
     private final Set<NetworkStateListener> stateListeners = new HashSet<>();
 
     private NetworkState state;
+
     private String lastAddress;
+    private ScheduledFuture<?> future;
 
     public NetworkClient(final LessonControlClientApplication application) {
         this.application = application;
@@ -39,6 +42,9 @@ public final class NetworkClient {
         Network.registerPacketClasses(client);
         client.addListener(new ClientListener());
         client.start();
+
+        // Transmit system-resources
+        Scheduler.schedule(new SystemResourceTransmissionRunnable(this), 1000);
 
         // Registering internal receivers
         registerReceivers();
@@ -77,8 +83,6 @@ public final class NetworkClient {
 
                 changeState(NetworkState.CONNECTING);
                 client.connect(2000, splitAddress[0], Integer.parseInt(splitAddress[1]));
-                changeState(NetworkState.CONNECTED);
-                lastAddress = client.getRemoteAddressTCP().getHostString();
                 break;
             } catch (final NumberFormatException e) {
                 log.error("Address '{}' invalidly formatted!", address, e);
@@ -104,13 +108,14 @@ public final class NetworkClient {
     }
 
     private void registerReceivers() {
-        distributor.addReceiver(ServerClientAcceptPacket.class, (connection, packet) -> {
-            changeState(NetworkState.READY);
-            Scheduler.schedule(new PerformanceRunnable(this), 1000);
-        });
+        distributor.addReceiver(ServerClientAcceptPacket.class, (connection, packet) -> changeState(NetworkState.READY));
         distributor.addReceiver(ServerClientDenyPacket.class, (connection, packet) -> {
             changeState(NetworkState.ERROR);
-            log.error("Denied by server '{}'! Reason: {}; Message: {}", lastAddress, packet.getReason(), packet.getMessage());
+            if (packet.getMessage().isEmpty()) {
+                log.error("Denied by server '{}' (Reason: {})", lastAddress, packet.getReason());
+            } else {
+                log.error("Denied by server '{}' (Reason: {}; Message: {})", lastAddress, packet.getReason(), packet.getMessage());
+            }
         });
 
         addListener(state -> log.info("Network state is now '{}'", state));
@@ -126,7 +131,8 @@ public final class NetworkClient {
         @Override
         public void connected(final Connection connection) {
             client.sendTCP(new ClientRegisterPacket(application.getMachineName(), Network.PROTOCOL_VERSION, SystemResourcesUtil.getTotalMemory()));
-            changeState(NetworkState.REGISTERED);
+            lastAddress = client.getRemoteAddressTCP().getHostString();
+            changeState(NetworkState.CONNECTED);
         }
 
         @Override

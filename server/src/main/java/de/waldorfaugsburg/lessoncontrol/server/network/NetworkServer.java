@@ -65,6 +65,7 @@ public final class NetworkServer {
             if (packet.getProtocolVersion() != Network.PROTOCOL_VERSION) {
                 connection.sendTCP(new ServerClientDenyPacket(ServerClientDenyPacket.Reason.OUTDATED_CLIENT, "use " + Network.PROTOCOL_VERSION));
                 log.error("Denied '{}' due to unsupported protocol version 'v{}'", connection.getRemoteAddressTCP().getHostString(), packet.getProtocolVersion());
+                connection.close();
                 return;
             }
 
@@ -72,6 +73,7 @@ public final class NetworkServer {
             if (device == null) {
                 connection.sendTCP(new ServerClientDenyPacket(ServerClientDenyPacket.Reason.UNKNOWN_DEVICE, ""));
                 log.error("Denied '{}' due to unknown device '{}'", connection.getRemoteAddressTCP().getHostString(), packet.getName());
+                connection.close();
                 return;
             }
 
@@ -91,7 +93,11 @@ public final class NetworkServer {
 
         @Override
         public void disconnected(final Connection connection) {
-            log.info("'{}' disconnected!", ((DeviceConnection) connection).getDevice().getName());
+            final DeviceConnection deviceConnection = (DeviceConnection) connection;
+            final Device device = deviceConnection.getDevice();
+            if(device == null) return;
+
+            log.info("'{}' disconnected!", device.getName());
         }
 
         @Override

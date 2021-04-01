@@ -8,13 +8,12 @@ public final class Device {
 
     private final DeviceConfiguration.DeviceInfo info;
 
+    private DeviceConnection connection;
     private DeviceState state = DeviceState.OFFLINE;
 
-    private DeviceConnection connection;
-    private int processorCount;
-    private double cpuUsage;
     private long totalMemory;
-    private long usedMemory;
+    private long freeMemory;
+    private double load;
 
     public Device(final DeviceConfiguration.DeviceInfo info) {
         this.info = info;
@@ -24,8 +23,12 @@ public final class Device {
         this.connection = connection;
 
         state = DeviceState.ONLINE;
-        processorCount = packet.getProcessorCount();
         totalMemory = packet.getTotalMemory();
+    }
+
+    public void updateSystemResources(final long freeMemory, final double load) {
+        this.freeMemory = freeMemory;
+        this.load = load;
     }
 
     public String getName() {
@@ -36,39 +39,23 @@ public final class Device {
         return info;
     }
 
-    public DeviceState getState() {
-        return state;
-    }
-
-    public void setState(final DeviceState state) {
-        this.state = state;
-    }
-
     public DeviceConnection getConnection() {
         return connection;
     }
 
-    public int getProcessorCount() {
-        return processorCount;
+    public DeviceState getState() {
+        return state;
     }
 
     public long getTotalMemory() {
         return totalMemory;
     }
 
-    public double getCpuUsage() {
-        return cpuUsage;
+    public long getFreeMemory() {
+        return freeMemory;
     }
 
-    public void setCpuUsage(final double cpuUsage) {
-        this.cpuUsage = cpuUsage;
-    }
-
-    public long getUsedMemory() {
-        return usedMemory;
-    }
-
-    public void setUsedMemory(final long usedMemory) {
-        this.usedMemory = usedMemory;
+    public double getLoad() {
+        return load;
     }
 }

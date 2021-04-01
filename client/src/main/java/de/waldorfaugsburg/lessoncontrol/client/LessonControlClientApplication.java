@@ -5,7 +5,6 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.stream.JsonReader;
 import de.waldorfaugsburg.lessoncontrol.client.config.ClientConfiguration;
 import de.waldorfaugsburg.lessoncontrol.client.network.NetworkClient;
-import de.waldorfaugsburg.lessoncontrol.client.performance.PerformanceManager;
 import de.waldorfaugsburg.lessoncontrol.client.tray.TrayManager;
 import lombok.extern.slf4j.Slf4j;
 
@@ -26,7 +25,6 @@ public final class LessonControlClientApplication {
 
     private NetworkClient networkClient;
     private TrayManager trayManager;
-    private PerformanceManager performanceManager;
 
     public void enable() {
         try {
@@ -44,12 +42,9 @@ public final class LessonControlClientApplication {
 
         // Initialize services
         networkClient = new NetworkClient(this);
-        performanceManager = new PerformanceManager(this);
-
         trayManager = new TrayManager(this);
 
         networkClient.connect();
-        performanceManager.startPerformanceTransmission();
     }
 
     public void disable() {
@@ -82,10 +77,6 @@ public final class LessonControlClientApplication {
 
     public TrayManager getTrayManager() {
         return trayManager;
-    }
-
-    public PerformanceManager getPerformanceManager() {
-        return performanceManager;
     }
 
     private ClientConfiguration parseConfiguration() throws IOException {

@@ -4,6 +4,7 @@ import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import de.waldorfaugsburg.lessoncontrol.client.LessonControlClientApplication;
+import de.waldorfaugsburg.lessoncontrol.client.util.SystemResourcesUtil;
 import de.waldorfaugsburg.lessoncontrol.common.network.Network;
 import de.waldorfaugsburg.lessoncontrol.common.network.Packet;
 import de.waldorfaugsburg.lessoncontrol.common.network.PacketDistributor;
@@ -105,6 +106,7 @@ public final class NetworkClient {
     private void registerReceivers() {
         distributor.addReceiver(ServerClientAcceptPacket.class, (connection, packet) -> {
             changeState(NetworkState.READY);
+            Scheduler.schedule(new PerformanceRunnable(this), 1000);
         });
         distributor.addReceiver(ServerClientDenyPacket.class, (connection, packet) -> {
             changeState(NetworkState.ERROR);
@@ -123,9 +125,7 @@ public final class NetworkClient {
 
         @Override
         public void connected(final Connection connection) {
-            client.sendTCP(new ClientRegisterPacket(application.getMachineName(), Network.PROTOCOL_VERSION,
-                    application.getPerformanceManager().getProcessorCount(),
-                    application.getPerformanceManager().getTotalMemory()));
+            client.sendTCP(new ClientRegisterPacket(application.getMachineName(), Network.PROTOCOL_VERSION, SystemResourcesUtil.getTotalMemory()));
             changeState(NetworkState.REGISTERED);
         }
 

@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
-public final class ClientPerformancePacket extends Packet {
-    private double cpuUsage;
-    private long usedMemory;
+public final class ClientSystemResourcesPacket extends Packet {
+    private long freeMemory;
+    private double load;
 }

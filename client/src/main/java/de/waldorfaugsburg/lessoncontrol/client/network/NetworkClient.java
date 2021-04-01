@@ -18,7 +18,6 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.ScheduledFuture;
 
 @Slf4j
 public final class NetworkClient {
@@ -32,7 +31,6 @@ public final class NetworkClient {
     private NetworkState state;
 
     private String lastAddress;
-    private ScheduledFuture<?> future;
 
     public NetworkClient(final LessonControlClientApplication application) {
         this.application = application;
@@ -113,8 +111,10 @@ public final class NetworkClient {
             changeState(NetworkState.ERROR);
             if (packet.getMessage().isEmpty()) {
                 log.error("Denied by server '{}' (Reason: {})", lastAddress, packet.getReason());
+                application.fatalError("Verbindung abgelehnt", "Die Verbindung zum LCS wurde abgelehnt!\n   Grund: " + packet.getReason());
             } else {
                 log.error("Denied by server '{}' (Reason: {}; Message: {})", lastAddress, packet.getReason(), packet.getMessage());
+                application.fatalError("Verbindung abgelehnt", "Die Verbindung zum LCS wurde abgelehnt!\n   Grund: " + packet.getReason() + "\n   Weitere Informationen: " + packet.getMessage());
             }
         });
 

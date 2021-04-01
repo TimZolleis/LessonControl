@@ -3,7 +3,6 @@ package de.waldorfaugsburg.lessoncontrol.client.tray;
 import de.waldorfaugsburg.lessoncontrol.client.LessonControlClientApplication;
 import lombok.extern.slf4j.Slf4j;
 
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -18,16 +17,16 @@ public final class TrayManager {
     public TrayManager(final LessonControlClientApplication application) {
         this.application = application;
 
-        SwingUtilities.invokeLater(this::initialize);
+        initialize();
     }
 
     private void initialize() {
         final Image trayImage = Toolkit.getDefaultToolkit().createImage(getClass().getResource("/tray.png"));
-        trayIcon = new TrayIcon(trayImage, "LessonControl");
+        trayIcon = new TrayIcon(trayImage);
         trayIcon.setImageAutoSize(true);
 
         final PopupMenu menu = new PopupMenu();
-        final MenuItem statusItem = new MenuItem("");
+        final MenuItem statusItem = new MenuItem();
         statusItem.setEnabled(false);
         menu.add(statusItem);
         menu.addSeparator();
@@ -42,10 +41,10 @@ public final class TrayManager {
             log.error("An error occurred while adding tray icon", e);
         }
 
-        application.getNetworkClient().addListener(state -> SwingUtilities.invokeLater(() -> {
+        application.getNetworkClient().addListener(state -> {
             statusItem.setLabel(state.getMessage());
             trayIcon.setToolTip("LessonControl\n" + state.getMessage());
-        }));
+        });
     }
 
     private MenuItem createItem(final String label, final ActionListener listener) {
@@ -60,13 +59,11 @@ public final class TrayManager {
             try {
                 Desktop.getDesktop().open(file);
             } catch (final IOException ex) {
-                JOptionPane.showMessageDialog(null, "Beim Öffnen der Logdatei ist ein Fehler aufgetreten!",
-                        "Logdatei öffnen", JOptionPane.ERROR_MESSAGE);
-                log.error("An error occurred while opening log", ex);
+                application.fatalError("Logdatei öffnen", "Beim Öffnen der Logdatei ist ein Fehler aufgetreten! " +
+                        "(" + ex.getClass().getSimpleName() + " - " + ex.getMessage() + ")");
             }
         } else {
-            JOptionPane.showMessageDialog(null, "Keine Logdatei gefunden!",
-                    "Logdatei öffnen", JOptionPane.ERROR_MESSAGE);
+            application.fatalError("Logdatei öffnen", "Keine Logdatei gefunden");
         }
     }
 }

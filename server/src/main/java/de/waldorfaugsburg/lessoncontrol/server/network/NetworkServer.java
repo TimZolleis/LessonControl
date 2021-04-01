@@ -62,7 +62,7 @@ public final class NetworkServer {
 
     private void registerReceivers() {
         distributor.addReceiver(ClientRegisterPacket.class, (connection, packet) -> {
-            if (packet.getProtocolVersion() != Network.PROTOCOL_VERSION) {
+            if (packet.getProtocolVersion() != 2) {
                 connection.sendTCP(new ServerClientDenyPacket(ServerClientDenyPacket.Reason.OUTDATED_CLIENT, "use " + Network.PROTOCOL_VERSION));
                 log.error("Denied '{}' due to unsupported protocol version 'v{}'", connection.getRemoteAddressTCP().getHostString(), packet.getProtocolVersion());
                 connection.close();

@@ -8,6 +8,8 @@ import de.waldorfaugsburg.lessoncontrol.client.network.NetworkClient;
 import de.waldorfaugsburg.lessoncontrol.client.tray.TrayManager;
 import lombok.extern.slf4j.Slf4j;
 
+import javax.swing.*;
+import java.awt.*;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -40,6 +42,12 @@ public final class LessonControlClientApplication {
             System.exit(1);
         }
 
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (final Exception e) {
+            log.error("An error occurred while setting look and feel", e);
+        }
+
         // Initialize services
         networkClient = new NetworkClient(this);
         trayManager = new TrayManager(this);
@@ -49,6 +57,11 @@ public final class LessonControlClientApplication {
 
     public void disable() {
 
+    }
+
+    public void fatalError(final String title, final String message) {
+        ((Runnable) Toolkit.getDefaultToolkit().getDesktopProperty("win.sound.exclamation")).run();
+        SwingUtilities.invokeLater(() -> JOptionPane.showMessageDialog(null, message + "\n\nBitte wenden Sie sich umgehend an Fachpersonal!", title, JOptionPane.ERROR_MESSAGE));
     }
 
     public File getApplicationDirectory() {

@@ -1,21 +1,18 @@
 package de.waldorfaugsburg.lessoncontrol.client.util;
 
 import oshi.SystemInfo;
-
-import java.lang.management.ManagementFactory;
-import java.lang.management.OperatingSystemMXBean;
+import oshi.hardware.CentralProcessor;
 
 public final class SystemResourcesUtil {
 
-    private static final OperatingSystemMXBean OPERATING_SYSTEM_MX_BEAN = ManagementFactory.getOperatingSystemMXBean();
     private static final SystemInfo SYSTEM_INFO = new SystemInfo();
-
-    public static int getThreads() {
-        return SYSTEM_INFO.getHardware().getProcessor().getLogicalProcessorCount();
-    }
+    private static final CentralProcessor CENTRAL_PROCESSOR = SYSTEM_INFO.getHardware().getProcessor();
+    private static long[] PREVIOUS_TICKS = new long[CentralProcessor.TickType.values().length];
 
     public static double getLoad() {
-        return OPERATING_SYSTEM_MX_BEAN.getSystemLoadAverage() / getThreads();
+        final double load = CENTRAL_PROCESSOR.getSystemCpuLoadBetweenTicks(PREVIOUS_TICKS);
+        PREVIOUS_TICKS = CENTRAL_PROCESSOR.getSystemCpuLoadTicks();
+        return load * 100;
     }
 
     public static long getTotalMemory() {

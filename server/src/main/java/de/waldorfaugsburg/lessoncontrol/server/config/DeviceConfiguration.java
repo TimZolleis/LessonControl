@@ -17,6 +17,7 @@ public final class DeviceConfiguration implements Serializable {
     public final static class DeviceInfo {
         private String name;
         private String address;
-        private String group;
+        private String location;
+        private String profile;
     }
 }

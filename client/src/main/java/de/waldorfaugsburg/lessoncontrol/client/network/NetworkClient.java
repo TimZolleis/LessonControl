@@ -8,9 +8,9 @@ import de.waldorfaugsburg.lessoncontrol.client.util.SystemResourcesUtil;
 import de.waldorfaugsburg.lessoncontrol.common.network.Network;
 import de.waldorfaugsburg.lessoncontrol.common.network.Packet;
 import de.waldorfaugsburg.lessoncontrol.common.network.PacketDistributor;
-import de.waldorfaugsburg.lessoncontrol.common.network.client.ClientRegisterPacket;
-import de.waldorfaugsburg.lessoncontrol.common.network.server.ServerClientAcceptPacket;
-import de.waldorfaugsburg.lessoncontrol.common.network.server.ServerClientDenyPacket;
+import de.waldorfaugsburg.lessoncontrol.common.network.client.RegisterPacket;
+import de.waldorfaugsburg.lessoncontrol.common.network.server.AcceptPacket;
+import de.waldorfaugsburg.lessoncontrol.common.network.server.DenyPacket;
 import de.waldorfaugsburg.lessoncontrol.common.util.Scheduler;
 import lombok.extern.slf4j.Slf4j;
 
@@ -106,8 +106,8 @@ public final class NetworkClient {
     }
 
     private void registerReceivers() {
-        distributor.addReceiver(ServerClientAcceptPacket.class, (connection, packet) -> changeState(NetworkState.READY));
-        distributor.addReceiver(ServerClientDenyPacket.class, (connection, packet) -> {
+        distributor.addReceiver(AcceptPacket.class, (connection, packet) -> changeState(NetworkState.READY));
+        distributor.addReceiver(DenyPacket.class, (connection, packet) -> {
             changeState(NetworkState.ERROR);
             if (packet.getMessage().isEmpty()) {
                 log.error("Denied by server '{}' (Reason: {})", lastAddress, packet.getReason());
@@ -130,7 +130,7 @@ public final class NetworkClient {
 
         @Override
         public void connected(final Connection connection) {
-            client.sendTCP(new ClientRegisterPacket(application.getMachineName(), Network.PROTOCOL_VERSION, SystemResourcesUtil.getTotalMemory()));
+            client.sendTCP(new RegisterPacket(application.getMachineName(), Network.PROTOCOL_VERSION, SystemResourcesUtil.getTotalMemory()));
             lastAddress = client.getRemoteAddressTCP().getHostString();
             changeState(NetworkState.CONNECTED);
         }

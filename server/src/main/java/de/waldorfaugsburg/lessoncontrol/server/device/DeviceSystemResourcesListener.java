@@ -1,6 +1,6 @@
 package de.waldorfaugsburg.lessoncontrol.server.device;
 
-import de.waldorfaugsburg.lessoncontrol.common.network.client.ClientSystemResourcesPacket;
+import de.waldorfaugsburg.lessoncontrol.common.network.client.SystemResourcesPacket;
 import de.waldorfaugsburg.lessoncontrol.server.network.NetworkServer;
 import org.springframework.stereotype.Component;
 
@@ -17,7 +17,7 @@ public final class DeviceSystemResourcesListener {
 
     @PostConstruct
     private void init() {
-        networkServer.getDistributor().addReceiver(ClientSystemResourcesPacket.class, (connection, packet) -> {
+        networkServer.getDistributor().addReceiver(SystemResourcesPacket.class, (connection, packet) -> {
             final Device device = connection.getDevice();
             if (device == null) return;
 

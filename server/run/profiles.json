@@ -1,0 +1,12 @@
+{
+  "filesFolder": "files/",
+  "defaultProfile": "default",
+  "profiles": [
+    {
+      "name": "default",
+      "files": {
+        "default/voicemeeter.xml": "C:/Users/linus/AppData/Roaming/voicemeeter.xml"
+      }
+    }
+  ]
+}

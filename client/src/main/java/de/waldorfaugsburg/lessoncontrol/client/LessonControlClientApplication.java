@@ -5,6 +5,9 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.stream.JsonReader;
 import de.waldorfaugsburg.lessoncontrol.client.config.ClientConfiguration;
 import de.waldorfaugsburg.lessoncontrol.client.network.NetworkClient;
+import de.waldorfaugsburg.lessoncontrol.client.profile.ProfileManager;
+import de.waldorfaugsburg.lessoncontrol.client.service.ServiceManager;
+import de.waldorfaugsburg.lessoncontrol.client.splash.SplashManager;
 import de.waldorfaugsburg.lessoncontrol.client.tray.TrayManager;
 import lombok.extern.slf4j.Slf4j;
 
@@ -26,7 +29,10 @@ public final class LessonControlClientApplication {
     private ClientConfiguration configuration;
 
     private NetworkClient networkClient;
+    private ProfileManager profileManager;
+    private ServiceManager serviceManager;
     private TrayManager trayManager;
+    private SplashManager splashManager;
 
     public void enable() {
         try {
@@ -50,7 +56,10 @@ public final class LessonControlClientApplication {
 
         // Initialize services
         networkClient = new NetworkClient(this);
+        profileManager = new ProfileManager(this);
+        serviceManager = new ServiceManager(this);
         trayManager = new TrayManager(this);
+        splashManager = new SplashManager(this);
 
         networkClient.connect();
     }
@@ -86,6 +95,14 @@ public final class LessonControlClientApplication {
 
     public NetworkClient getNetworkClient() {
         return networkClient;
+    }
+
+    public ProfileManager getProfileManager() {
+        return profileManager;
+    }
+
+    public ServiceManager getServiceManager() {
+        return serviceManager;
     }
 
     public TrayManager getTrayManager() {

@@ -8,12 +8,13 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
-public final class ServerClientDenyPacket extends Packet {
+public final class DenyPacket extends Packet {
     private Reason reason;
     private String message;
 
     public enum Reason {
         OUTDATED_CLIENT,
-        UNKNOWN_DEVICE
+        UNKNOWN_DEVICE,
+        UNKNOWN_PROFILE
     }
 }

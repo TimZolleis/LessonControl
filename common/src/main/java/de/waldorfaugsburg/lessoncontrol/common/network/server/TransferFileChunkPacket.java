@@ -1,4 +1,4 @@
-package de.waldorfaugsburg.lessoncontrol.common.network.client;
+package de.waldorfaugsburg.lessoncontrol.common.network.server;
 
 import de.waldorfaugsburg.lessoncontrol.common.network.Packet;
 import lombok.AllArgsConstructor;
@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
-public final class ClientSystemResourcesPacket extends Packet {
-    private long freeMemory;
-    private double load;
+public final class TransferFileChunkPacket extends Packet {
+    private byte[] chunk;
 }

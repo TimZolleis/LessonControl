@@ -6,12 +6,10 @@ import com.esotericsoftware.kryonet.Server;
 import de.waldorfaugsburg.lessoncontrol.common.network.Network;
 import de.waldorfaugsburg.lessoncontrol.common.network.Packet;
 import de.waldorfaugsburg.lessoncontrol.common.network.PacketDistributor;
-import de.waldorfaugsburg.lessoncontrol.common.network.client.ClientRegisterPacket;
-import de.waldorfaugsburg.lessoncontrol.common.network.server.ServerClientAcceptPacket;
-import de.waldorfaugsburg.lessoncontrol.common.network.server.ServerClientDenyPacket;
+import de.waldorfaugsburg.lessoncontrol.common.network.client.RegisterPacket;
+import de.waldorfaugsburg.lessoncontrol.common.network.server.DenyPacket;
 import de.waldorfaugsburg.lessoncontrol.server.config.ServerConfiguration;
 import de.waldorfaugsburg.lessoncontrol.server.device.Device;
-import de.waldorfaugsburg.lessoncontrol.server.device.DeviceService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -19,13 +17,14 @@ import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.util.HashSet;
+import java.util.Set;
 
 @Slf4j
 @Service
 public final class NetworkServer {
 
     private final ServerConfiguration configuration;
-    private final DeviceService deviceService;
 
     private final Server server = new Server() {
         @Override
@@ -34,10 +33,10 @@ public final class NetworkServer {
         }
     };
     private final PacketDistributor<DeviceConnection> distributor = new PacketDistributor<>();
+    private final Set<NetworkServerListener> listeners = new HashSet<>();
 
-    public NetworkServer(final ServerConfiguration configuration, final DeviceService deviceService) {
+    public NetworkServer(final ServerConfiguration configuration) {
         this.configuration = configuration;
-        this.deviceService = deviceService;
     }
 
     @PostConstruct
@@ -61,27 +60,23 @@ public final class NetworkServer {
     }
 
     private void registerReceivers() {
-        distributor.addReceiver(ClientRegisterPacket.class, (connection, packet) -> {
+        distributor.addReceiver(RegisterPacket.class, (connection, packet) -> {
             if (packet.getProtocolVersion() != Network.PROTOCOL_VERSION) {
-                connection.sendTCP(new ServerClientDenyPacket(ServerClientDenyPacket.Reason.OUTDATED_CLIENT, "use " + Network.PROTOCOL_VERSION));
-                log.error("Denied '{}' due to unsupported protocol version 'v{}'", connection.getRemoteAddressTCP().getHostString(), packet.getProtocolVersion());
-                connection.close();
+                connection.deny(DenyPacket.Reason.OUTDATED_CLIENT, "Required protocol-version is " + Network.PROTOCOL_VERSION);
                 return;
             }
 
-            final Device device = deviceService.getDevice(packet.getName());
-            if (device == null) {
-                connection.sendTCP(new ServerClientDenyPacket(ServerClientDenyPacket.Reason.UNKNOWN_DEVICE, ""));
-                log.error("Denied '{}' due to unknown device '{}'", connection.getRemoteAddressTCP().getHostString(), packet.getName());
-                connection.close();
-                return;
-            }
-
-            device.handleRegistration(connection, packet);
-            connection.setDevice(device);
-            connection.sendTCP(new ServerClientAcceptPacket());
-            log.info("'{}' registered as '{}'", connection.getRemoteAddressTCP().getHostString(), packet.getName());
+            log.info("'{}' is trying to register ...", connection.getRemoteAddressTCP().getHostString());
+            listeners.forEach(listener -> listener.register(connection, packet));
         });
+    }
+
+    public void addListener(final NetworkServerListener listener) {
+        listeners.add(listener);
+    }
+
+    public void removeListener(final NetworkServerListener listener) {
+        listeners.remove(listener);
     }
 
     private final class ServerListener implements Listener {
@@ -95,8 +90,9 @@ public final class NetworkServer {
         public void disconnected(final Connection connection) {
             final DeviceConnection deviceConnection = (DeviceConnection) connection;
             final Device device = deviceConnection.getDevice();
-            if(device == null) return;
+            if (device == null) return;
 
+            device.handleDisconnect();
             log.info("'{}' disconnected!", device.getName());
         }
 

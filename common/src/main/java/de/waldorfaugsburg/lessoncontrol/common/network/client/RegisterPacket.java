@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
-public final class ClientRegisterPacket extends Packet {
+public final class RegisterPacket extends Packet {
     private String name;
     private int protocolVersion;
     private long totalMemory;

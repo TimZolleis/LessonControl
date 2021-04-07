@@ -1,5 +1,6 @@
 package de.waldorfaugsburg.lessoncontrol.server.command;
 
+import de.vandermeer.asciitable.AT_Context;
 import de.vandermeer.asciitable.AsciiTable;
 import de.vandermeer.skb.interfaces.transformers.textformat.TextAlignment;
 import de.waldorfaugsburg.lessoncontrol.server.device.Device;
@@ -32,10 +33,10 @@ public final class DeviceCommands {
     @ShellMethod(key = "devices", value = "Lists all devices")
     public String list() {
         final List<Device> devices = new ArrayList<>(service.getDevices());
-        devices.sort(Comparator.comparing(Device::isConnected).thenComparing(Device::getName));
+        devices.sort(Comparator.comparing(Device::getName));
 
         log.info("All devices ({}):", devices.size());
-        final AsciiTable table = new AsciiTable();
+        final AsciiTable table = new AsciiTable(new AT_Context().setWidth(150));
         table.addRule();
         table.addRow("Name", "Location", "Profile", "Connected", "CPU", "Memory");
         table.addRule();
@@ -45,7 +46,7 @@ public final class DeviceCommands {
                 table.addRow(device.getName(),
                         device.getInfo().getLocation(),
                         device.getInfo().getProfile(),
-                        "YES<br>(" + DateFormatUtils.format(device.getConnectedAt(), "dd.MM. hh:mm") + ")",
+                        "YES (" + DateFormatUtils.format(device.getConnectedAt(), "dd.MM. HH:mm") + ")",
                         DECIMAL_FORMAT.format(device.getLoad()) + " %",
                         formatMemory(device.getTotalMemory(), device.getFreeMemory()));
             } else {

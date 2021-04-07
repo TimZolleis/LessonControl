@@ -1,5 +1,6 @@
 package de.waldorfaugsburg.lessoncontrol.server.config;
 
+import de.waldorfaugsburg.lessoncontrol.common.service.AbstractServiceConfiguration;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -18,6 +19,7 @@ public final class ProfileConfiguration implements Serializable {
     @Getter
     public final static class ProfileInfo {
         private String name;
+        private Set<AbstractServiceConfiguration> configurations;
         private Map<String, String> files;
     }
 }

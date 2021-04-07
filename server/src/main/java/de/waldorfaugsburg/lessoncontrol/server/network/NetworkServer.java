@@ -3,6 +3,7 @@ package de.waldorfaugsburg.lessoncontrol.server.network;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Server;
+import de.waldorfaugsburg.lessoncontrol.common.event.EventDistributor;
 import de.waldorfaugsburg.lessoncontrol.common.network.Network;
 import de.waldorfaugsburg.lessoncontrol.common.network.Packet;
 import de.waldorfaugsburg.lessoncontrol.common.network.PacketDistributor;
@@ -17,14 +18,13 @@ import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.util.HashSet;
-import java.util.Set;
 
 @Slf4j
 @Service
 public final class NetworkServer {
 
     private final ServerConfiguration configuration;
+    private final EventDistributor eventDistributor;
 
     private final Server server = new Server() {
         @Override
@@ -33,10 +33,10 @@ public final class NetworkServer {
         }
     };
     private final PacketDistributor<DeviceConnection> distributor = new PacketDistributor<>();
-    private final Set<NetworkServerListener> listeners = new HashSet<>();
 
-    public NetworkServer(final ServerConfiguration configuration) {
+    public NetworkServer(final ServerConfiguration configuration, final EventDistributor eventDistributor) {
         this.configuration = configuration;
+        this.eventDistributor = eventDistributor;
     }
 
     @PostConstruct
@@ -60,23 +60,15 @@ public final class NetworkServer {
     }
 
     private void registerReceivers() {
-        distributor.addReceiver(RegisterPacket.class, (connection, packet) -> {
+        distributor.addListener(RegisterPacket.class, (connection, packet) -> {
             if (packet.getProtocolVersion() != Network.PROTOCOL_VERSION) {
                 connection.deny(DenyPacket.Reason.OUTDATED_CLIENT, "Required protocol-version is " + Network.PROTOCOL_VERSION);
                 return;
             }
 
             log.info("'{}' is trying to register ...", connection.getRemoteAddressTCP().getHostString());
-            listeners.forEach(listener -> listener.register(connection, packet));
+            eventDistributor.call(NetworkListener.class, listener -> listener.onRegister(connection, packet));
         });
-    }
-
-    public void addListener(final NetworkServerListener listener) {
-        listeners.add(listener);
-    }
-
-    public void removeListener(final NetworkServerListener listener) {
-        listeners.remove(listener);
     }
 
     private final class ServerListener implements Listener {

@@ -6,18 +6,18 @@ import com.google.common.collect.Multimap;
 
 public final class PacketDistributor<C extends Connection> {
 
-    private final Multimap<Class<?>, PacketReceiver<C, Packet>> packetReceiverMultimap = HashMultimap.create();
+    private final Multimap<Class<?>, PacketListener<C, Packet>> packetReceiverMultimap = HashMultimap.create();
 
     public PacketDistributor() {
     }
 
     public void distribute(final C connection, final Packet packet) {
-        for (final PacketReceiver<C, Packet> receiver : packetReceiverMultimap.get(packet.getClass())) {
+        for (final PacketListener<C, Packet> receiver : packetReceiverMultimap.get(packet.getClass())) {
             receiver.receive(connection, packet);
         }
     }
 
-    public <T extends Packet> void addReceiver(final Class<T> clazz, final PacketReceiver<C, T> receiver) {
-        packetReceiverMultimap.put(clazz, (PacketReceiver<C, Packet>) receiver);
+    public <T extends Packet> void addListener(final Class<T> clazz, final PacketListener<C, T> receiver) {
+        packetReceiverMultimap.put(clazz, (PacketListener<C, Packet>) receiver);
     }
 }

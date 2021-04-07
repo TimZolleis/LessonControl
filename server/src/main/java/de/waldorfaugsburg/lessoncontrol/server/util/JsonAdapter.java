@@ -1,0 +1,34 @@
+package de.waldorfaugsburg.lessoncontrol.server.util;
+
+import com.google.gson.*;
+
+import java.lang.reflect.Type;
+import java.util.HashMap;
+import java.util.Map;
+
+public final class JsonAdapter<T> implements JsonSerializer<T>, JsonDeserializer<T> {
+
+    private final Map<String, Class<?>> classMap = new HashMap<>();
+
+    @Override
+    public JsonElement serialize(final T server, final Type type, final JsonSerializationContext context) {
+        final JsonObject object = context.serialize(server, server.getClass()).getAsJsonObject();
+        object.addProperty("type", server.getClass().getCanonicalName());
+        return object;
+    }
+
+    @Override
+    public T deserialize(final JsonElement json, final Type type, final JsonDeserializationContext context) {
+        final JsonObject object = json.getAsJsonObject();
+        final String clazz = object.remove("type").getAsString();
+        return context.deserialize(object, classMap.computeIfAbsent(clazz, c -> {
+            try {
+                return Class.forName(c);
+            } catch (final ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }));
+    }
+
+}

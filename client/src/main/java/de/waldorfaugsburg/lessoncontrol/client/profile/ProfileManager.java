@@ -28,21 +28,20 @@ public final class ProfileManager {
     public ProfileManager(final LessonControlClientApplication application) {
         this.application = application;
 
-        registerReceivers();
+        registerListeners();
     }
 
-    private void registerReceivers() {
+    private void registerListeners() {
         final NetworkClient networkClient = application.getNetworkClient();
 
-        networkClient.getDistributor().addReceiver(TransferProfilePacket.class, (connection, packet) -> {
+        networkClient.getDistributor().addListener(TransferProfilePacket.class, (connection, packet) -> {
             if (networkClient.getState() != NetworkState.READY) {
                 log.error("Client isn't ready yet to receive profile");
                 return;
             }
-
             fileChunks = new byte[packet.getFileChunkCount()][Network.FILE_CHUNK_SIZE];
         });
-        networkClient.getDistributor().addReceiver(TransferFileChunkPacket.class, (connection, packet) -> {
+        networkClient.getDistributor().addListener(TransferFileChunkPacket.class, (connection, packet) -> {
             if (fileChunks == null) {
                 log.error("Client isn't ready yet to receive file chunks");
                 return;
@@ -67,6 +66,9 @@ public final class ProfileManager {
             System.arraycopy(chunk, 0, data, i * Network.FILE_CHUNK_SIZE, chunk.length);
         }
 
+        final int chunkCount = fileChunks.length;
+        fileChunks = null;
+
         final ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(data);
         final byte[] buffer = new byte[1024];
 
@@ -86,10 +88,9 @@ public final class ProfileManager {
                     }
                 }
             }
-            final int length = fileChunks.length;
-            fileChunks = null;
 
-            log.info("Received, assembled and wrote '{}' chunks with a total of '{} bytes'", length, totalLength);
+            log.info("Received, assembled and wrote '{}' chunks with a total of '{} bytes'", chunkCount, totalLength);
+            application.getEventDistributor().call(FileTransferListener.class, FileTransferListener::onTransferComplete);
         } catch (final IOException e) {
             log.error("An error occurred while unzipping profile", e);
         }

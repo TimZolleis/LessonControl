@@ -1,6 +1,7 @@
 package de.waldorfaugsburg.lessoncontrol.client.tray;
 
 import de.waldorfaugsburg.lessoncontrol.client.LessonControlClientApplication;
+import de.waldorfaugsburg.lessoncontrol.client.network.NetworkListener;
 import lombok.extern.slf4j.Slf4j;
 
 import java.awt.*;
@@ -41,7 +42,7 @@ public final class TrayManager {
             log.error("An error occurred while adding tray icon", e);
         }
 
-        application.getNetworkClient().addListener(state -> {
+        application.getEventDistributor().addListener(NetworkListener.class, state -> {
             statusItem.setLabel(state.getMessage());
             trayIcon.setToolTip("LessonControl\n" + state.getMessage());
         });

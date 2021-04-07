@@ -17,7 +17,7 @@ public final class DeviceSystemResourcesListener {
 
     @PostConstruct
     private void init() {
-        networkServer.getDistributor().addReceiver(SystemResourcesPacket.class, (connection, packet) -> {
+        networkServer.getDistributor().addListener(SystemResourcesPacket.class, (connection, packet) -> {
             final Device device = connection.getDevice();
             if (device == null) return;
 

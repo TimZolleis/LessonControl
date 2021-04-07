@@ -9,6 +9,7 @@ import de.waldorfaugsburg.lessoncontrol.client.profile.ProfileManager;
 import de.waldorfaugsburg.lessoncontrol.client.service.ServiceManager;
 import de.waldorfaugsburg.lessoncontrol.client.splash.SplashManager;
 import de.waldorfaugsburg.lessoncontrol.client.tray.TrayManager;
+import de.waldorfaugsburg.lessoncontrol.common.event.EventDistributor;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.swing.*;
@@ -27,6 +28,8 @@ public final class LessonControlClientApplication {
 
     private String machineName;
     private ClientConfiguration configuration;
+
+    private final EventDistributor eventDistributor = new EventDistributor();
 
     private NetworkClient networkClient;
     private ProfileManager profileManager;
@@ -93,6 +96,10 @@ public final class LessonControlClientApplication {
         return configuration;
     }
 
+    public EventDistributor getEventDistributor() {
+        return eventDistributor;
+    }
+
     public NetworkClient getNetworkClient() {
         return networkClient;
     }
@@ -107,6 +114,10 @@ public final class LessonControlClientApplication {
 
     public TrayManager getTrayManager() {
         return trayManager;
+    }
+
+    public SplashManager getSplashManager() {
+        return splashManager;
     }
 
     private ClientConfiguration parseConfiguration() throws IOException {

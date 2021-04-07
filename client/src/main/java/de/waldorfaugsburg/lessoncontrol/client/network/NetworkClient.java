@@ -15,9 +15,7 @@ import de.waldorfaugsburg.lessoncontrol.common.util.Scheduler;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Slf4j
 public final class NetworkClient {
@@ -26,7 +24,6 @@ public final class NetworkClient {
     private final Client client;
 
     private final PacketDistributor<Connection> distributor = new PacketDistributor<>();
-    private final Set<NetworkStateListener> stateListeners = new HashSet<>();
 
     private NetworkState state;
 
@@ -97,17 +94,9 @@ public final class NetworkClient {
         }
     }
 
-    public void addListener(final NetworkStateListener listener) {
-        stateListeners.add(listener);
-    }
-
-    public void removeListener(final NetworkStateListener listener) {
-        stateListeners.remove(listener);
-    }
-
     private void registerReceivers() {
-        distributor.addReceiver(AcceptPacket.class, (connection, packet) -> changeState(NetworkState.READY));
-        distributor.addReceiver(DenyPacket.class, (connection, packet) -> {
+        distributor.addListener(AcceptPacket.class, (connection, packet) -> changeState(NetworkState.READY));
+        distributor.addListener(DenyPacket.class, (connection, packet) -> {
             changeState(NetworkState.ERROR);
             if (packet.getMessage().isEmpty()) {
                 log.error("Denied by server '{}' (Reason: {})", lastAddress, packet.getReason());
@@ -118,12 +107,12 @@ public final class NetworkClient {
             }
         });
 
-        addListener(state -> log.info("Network state is now '{}'", state));
+        application.getEventDistributor().addListener(NetworkListener.class, state -> log.info("Network state is now '{}'", state));
     }
 
     private void changeState(final NetworkState state) {
         this.state = state;
-        stateListeners.forEach(listener -> listener.stateChange(state));
+        application.getEventDistributor().call(NetworkListener.class, listener -> listener.onStateChange(state));
     }
 
     private final class ClientListener implements Listener {

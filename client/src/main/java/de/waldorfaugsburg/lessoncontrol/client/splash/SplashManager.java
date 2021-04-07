@@ -1,7 +1,7 @@
 package de.waldorfaugsburg.lessoncontrol.client.splash;
 
 import de.waldorfaugsburg.lessoncontrol.client.LessonControlClientApplication;
-import de.waldorfaugsburg.lessoncontrol.client.network.NetworkClient;
+import de.waldorfaugsburg.lessoncontrol.client.network.NetworkListener;
 import de.waldorfaugsburg.lessoncontrol.client.network.NetworkState;
 import de.waldorfaugsburg.lessoncontrol.common.util.Scheduler;
 
@@ -21,8 +21,7 @@ public final class SplashManager {
     }
 
     private void registerReceivers() {
-        final NetworkClient networkClient = application.getNetworkClient();
-        networkClient.addListener(state -> {
+        application.getEventDistributor().addListener(NetworkListener.class, state -> {
             if (state == NetworkState.CONNECTING || state == NetworkState.CONNECTED || state == NetworkState.READY) {
                 splash(state.getMessage());
                 if (state == NetworkState.READY) {
@@ -62,6 +61,8 @@ public final class SplashManager {
     }
 
     private void dispose() {
+        if (dialog == null) return;
+
         dialog.dispose();
         dialog = null;
     }

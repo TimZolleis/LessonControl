@@ -9,6 +9,11 @@ import de.waldorfaugsburg.lessoncontrol.common.network.server.AcceptPacket;
 import de.waldorfaugsburg.lessoncontrol.common.network.server.DenyPacket;
 import de.waldorfaugsburg.lessoncontrol.common.network.server.TransferFileChunkPacket;
 import de.waldorfaugsburg.lessoncontrol.common.network.server.TransferProfilePacket;
+import de.waldorfaugsburg.lessoncontrol.common.service.AbstractServiceConfiguration;
+import de.waldorfaugsburg.lessoncontrol.common.service.GeneralServiceConfiguration;
+
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 public final class Network {
 
@@ -27,6 +32,11 @@ public final class Network {
 
         // General
         kryo.register(byte[].class);
+        kryo.register(Set.class);
+        kryo.register(LinkedHashSet.class);
+
+        kryo.register(AbstractServiceConfiguration.class);
+        kryo.register(GeneralServiceConfiguration.class);
 
         // Bound to client
         kryo.register(RegisterPacket.class);

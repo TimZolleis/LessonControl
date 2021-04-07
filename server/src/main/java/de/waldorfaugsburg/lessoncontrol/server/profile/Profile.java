@@ -26,7 +26,7 @@ public final class Profile {
         convertAndCacheFiles();
     }
 
-    private void convertAndCacheFiles() {
+    public void convertAndCacheFiles() {
         try {
             byte[] buffer = new byte[1024];
             final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();

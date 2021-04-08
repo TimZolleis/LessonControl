@@ -1,4 +1,4 @@
-package de.waldorfaugsburg.lessoncontrol.client.service.type;
+package de.waldorfaugsburg.lessoncontrol.client.service.general;
 
 import de.waldorfaugsburg.lessoncontrol.client.service.AbstractService;
 import de.waldorfaugsburg.lessoncontrol.client.util.WallpaperUtil;
@@ -8,7 +8,15 @@ public final class GeneralService extends AbstractService<GeneralServiceConfigur
 
     public GeneralService(final GeneralServiceConfiguration configuration) {
         super(configuration);
+    }
 
-        WallpaperUtil.setWallpaper(configuration.getWallpaperPath());
+    @Override
+    public void enable() {
+        WallpaperUtil.setWallpaper(getConfiguration().getWallpaperPath());
+    }
+
+    @Override
+    public void disable() {
+
     }
 }

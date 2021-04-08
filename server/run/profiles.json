@@ -11,6 +11,41 @@
         {
           "type": "de.waldorfaugsburg.lessoncontrol.common.service.GeneralServiceConfiguration",
           "wallpaperPath": "C:/Users/linus/Pictures/wallpaper.jpg"
+        },
+        {
+          "type": "de.waldorfaugsburg.lessoncontrol.common.service.VoicemeeterServiceConfiguration",
+          "dllPath": "C:/Program Files (x86)/VB/Voicemeeter/VoicemeeterRemote64.dll",
+          "configPath": "C:/Users/linus/AppData/Roaming/voicemeeter.xml",
+          "antiHowl": {
+            "enabled": true,
+            "monitoredChannel": 4,
+            "muteStrips": [
+              0,
+              1
+            ]
+          }
+        },
+        {
+          "type": "de.waldorfaugsburg.lessoncontrol.common.service.ButtonServiceConfiguration",
+          "rows": 1,
+          "columns": 3,
+          "buttons": [
+            {
+              "text": "Lehrer",
+              "textSize": 30,
+              "enabled": false
+            },
+            {
+              "text": "Schüler",
+              "textSize": 30,
+              "enabled": false
+            },
+            {
+              "text": "autom. Stummschaltung",
+              "textSize": 10,
+              "enabled": false
+            }
+          ]
         }
       ]
     }

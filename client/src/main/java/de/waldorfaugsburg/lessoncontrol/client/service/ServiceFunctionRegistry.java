@@ -13,7 +13,7 @@ public final class ServiceFunctionRegistry {
         return ((ServiceFunction<C>) SERVICE_FUNCTION_MAP.get(configuration.getClass())).get(configuration);
     }
 
-    public static <C extends AbstractServiceConfiguration> void registerService(final Class<C> configuration, final ServiceFunction<C> function) {
-        SERVICE_FUNCTION_MAP.put(configuration, function);
+    public static <C extends AbstractServiceConfiguration, S extends AbstractService<C>> void registerService(final Class<C> configurationClass, final ServiceFunction<C> function) {
+        SERVICE_FUNCTION_MAP.put(configurationClass, function);
     }
 }

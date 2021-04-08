@@ -10,6 +10,10 @@ public abstract class AbstractService<C extends AbstractServiceConfiguration> {
         this.configuration = configuration;
     }
 
+    public abstract void enable();
+
+    public abstract void disable();
+
     public C getConfiguration() {
         return configuration;
     }

@@ -89,6 +89,12 @@
       "address": "192.168.178.20",
       "location": "",
       "profile": "default"
+    },
+    {
+      "name": "FWASchuelerPC01",
+      "address": "192.168.52.69",
+      "location": "",
+      "profile": "default"
     }
   ]
 }

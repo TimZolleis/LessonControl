@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>de.waldorfaugburg.lessoncontrol</groupId>
+        <groupId>de.waldorfaugsburg.lessoncontrol</groupId>
         <artifactId>lessoncontrol</artifactId>
         <version>1.0</version>
     </parent>
@@ -55,7 +55,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>de.waldorfaugburg.lessoncontrol</groupId>
+            <groupId>de.waldorfaugsburg.lessoncontrol</groupId>
             <artifactId>common</artifactId>
             <version>1.0</version>
         </dependency>
@@ -63,6 +63,17 @@
             <groupId>com.github.oshi</groupId>
             <artifactId>oshi-core</artifactId>
             <version>5.6.1</version>
+        </dependency>
+        <dependency>
+            <groupId>net.twasi</groupId>
+            <artifactId>obs-websocket-java</artifactId>
+            <version>1.2.0</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-simple</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>

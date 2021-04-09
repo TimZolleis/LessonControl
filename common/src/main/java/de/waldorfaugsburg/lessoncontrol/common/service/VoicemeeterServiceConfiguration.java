@@ -6,7 +6,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Getter
 public final class VoicemeeterServiceConfiguration extends AbstractServiceConfiguration {
-    private String dllPath;
     private String configPath;
     private AntiHowl antiHowl;
 

@@ -9,10 +9,7 @@ import de.waldorfaugsburg.lessoncontrol.common.network.server.AcceptPacket;
 import de.waldorfaugsburg.lessoncontrol.common.network.server.DenyPacket;
 import de.waldorfaugsburg.lessoncontrol.common.network.server.TransferFileChunkPacket;
 import de.waldorfaugsburg.lessoncontrol.common.network.server.TransferProfilePacket;
-import de.waldorfaugsburg.lessoncontrol.common.service.AbstractServiceConfiguration;
-import de.waldorfaugsburg.lessoncontrol.common.service.ButtonServiceConfiguration;
-import de.waldorfaugsburg.lessoncontrol.common.service.GeneralServiceConfiguration;
-import de.waldorfaugsburg.lessoncontrol.common.service.VoicemeeterServiceConfiguration;
+import de.waldorfaugsburg.lessoncontrol.common.service.*;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -20,7 +17,7 @@ import java.util.Set;
 public final class Network {
 
     public static final int PROTOCOL_VERSION = 1;
-    public static final int FILE_CHUNK_SIZE = 500;
+    public static final int FILE_CHUNK_SIZE = 1024;
 
     static {
         Log.set(Log.LEVEL_ERROR);
@@ -44,6 +41,7 @@ public final class Network {
         kryo.register(VoicemeeterServiceConfiguration.AntiHowl.class);
         kryo.register(ButtonServiceConfiguration.class);
         kryo.register(ButtonServiceConfiguration.Button.class);
+        kryo.register(OBSServiceConfiguration.class);
 
         // Bound to client
         kryo.register(RegisterPacket.class);

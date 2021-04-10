@@ -36,20 +36,16 @@ public final class ButtonService extends AbstractService<ButtonServiceConfigurat
     public void enable() {
         dialog = new JDialog();
         dialog.setLayout(new GridLayout(1, getConfiguration().getStripButtons().size()));
-
         for (final ButtonServiceConfiguration.StripButton button : getConfiguration().getStripButtons()) {
             dialog.add(createStripButton(button));
         }
-
         dialog.add(createButton("autom. Stummschaltung", 15, true, service::setAntiHowlEnabled));
-
         dialog.setUndecorated(true);
         dialog.setResizable(false);
         dialog.setAlwaysOnTop(true);
         dialog.setModalityType(Dialog.ModalityType.APPLICATION_MODAL);
         dialog.setModal(true);
         dialog.pack();
-
         Scheduler.runLater(() -> dialog.setVisible(true), 0);
     }
 
@@ -59,9 +55,8 @@ public final class ButtonService extends AbstractService<ButtonServiceConfigurat
     }
 
     private JToggleButton createStripButton(final ButtonServiceConfiguration.StripButton button) {
-        return createButton(button.getLabel(), 30, button.isEnabled(), enabled -> {
-            Voicemeeter.setParameterFloat("Strip(" + button.getStrip() + ").Mute", enabled ? 0 : 1);
-        });
+        return createButton(button.getLabel(), 30, button.isEnabled(),
+                enabled -> Voicemeeter.setParameterFloat("Strip(" + button.getStrip() + ").Mute", enabled ? 0 : 1));
     }
 
     private JToggleButton createButton(final String label, final int textSize, final boolean enabled, final Consumer<Boolean> toggleListener) {

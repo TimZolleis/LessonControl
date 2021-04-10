@@ -32,7 +32,7 @@
         },
         {
           "type": "de.waldorfaugsburg.lessoncontrol.common.service.OBSServiceConfiguration",
-          "sceneCollection": "DefaultGross",
+          "sceneCollection": "DefaultKlein",
           "documentCamera": {
             "scene": "Dokumentenkamera",
             "source": "DCAM",

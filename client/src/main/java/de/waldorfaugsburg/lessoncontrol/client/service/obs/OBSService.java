@@ -73,7 +73,12 @@ public final class OBSService extends AbstractService<OBSServiceConfiguration> {
 
     private void start() {
         try {
-            new ProcessBuilder(EXECUTABLE_PATH).directory(new File(WORKING_DIRECTORY)).start();
+            new ProcessBuilder(EXECUTABLE_PATH, "--startvirtualcam",
+                    "--disable-updater",
+                    "--minimize-to-tray",
+                    "--collection", getConfiguration().getSceneCollection())
+                    .directory(new File(WORKING_DIRECTORY))
+                    .start();
         } catch (final IOException e) {
             log.error("An error occurred starting OBS", e);
         }

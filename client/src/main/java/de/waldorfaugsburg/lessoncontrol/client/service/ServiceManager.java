@@ -6,11 +6,13 @@ import de.waldorfaugsburg.lessoncontrol.client.network.NetworkListener;
 import de.waldorfaugsburg.lessoncontrol.client.network.NetworkState;
 import de.waldorfaugsburg.lessoncontrol.client.profile.FileTransferListener;
 import de.waldorfaugsburg.lessoncontrol.client.service.button.ButtonService;
-import de.waldorfaugsburg.lessoncontrol.client.service.general.GeneralService;
 import de.waldorfaugsburg.lessoncontrol.client.service.obs.OBSService;
 import de.waldorfaugsburg.lessoncontrol.client.service.voicemeeter.VoicemeeterService;
 import de.waldorfaugsburg.lessoncontrol.common.network.server.TransferProfilePacket;
-import de.waldorfaugsburg.lessoncontrol.common.service.*;
+import de.waldorfaugsburg.lessoncontrol.common.service.AbstractServiceConfiguration;
+import de.waldorfaugsburg.lessoncontrol.common.service.ButtonServiceConfiguration;
+import de.waldorfaugsburg.lessoncontrol.common.service.OBSServiceConfiguration;
+import de.waldorfaugsburg.lessoncontrol.common.service.VoicemeeterServiceConfiguration;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.HashMap;
@@ -29,18 +31,17 @@ public final class ServiceManager {
         this.application = application;
 
         // Register services
-        ServiceFunctionRegistry.registerService(GeneralServiceConfiguration.class, GeneralService::new);
-        ServiceFunctionRegistry.registerService(VoicemeeterServiceConfiguration.class, VoicemeeterService::new);
-        ServiceFunctionRegistry.registerService(ButtonServiceConfiguration.class, ButtonService::new);
-        ServiceFunctionRegistry.registerService(OBSServiceConfiguration.class, OBSService::new);
+        ServiceFunctionRegistry.registerService(VoicemeeterServiceConfiguration.class, config -> new VoicemeeterService(application, config));
+        ServiceFunctionRegistry.registerService(ButtonServiceConfiguration.class, config -> new ButtonService(application, config));
+        ServiceFunctionRegistry.registerService(OBSServiceConfiguration.class, config -> new OBSService(application, config));
 
         registerListeners();
     }
 
-    public void disableServices() {
+    public void disableServices(final boolean shutdown) {
         for (final AbstractService<?> service : serviceMap.values()) {
             try {
-                service.disable();
+                service.disable(shutdown);
                 log.info("Disabled service '{}'", service.getClass().getSimpleName());
             } catch (final Exception e) {
                 log.error("An error occurred disabling service '{}'", service.getClass().getSimpleName(), e);
@@ -54,12 +55,12 @@ public final class ServiceManager {
         networkClient.getDistributor().addListener(TransferProfilePacket.class, (connection, packet) -> this.configurations = packet.getServiceConfigurations());
         application.getEventDistributor().addListener(FileTransferListener.class, this::initializeServices);
         application.getEventDistributor().addListener(NetworkListener.class, state -> {
-            if (state == NetworkState.CONNECTING) disableServices();
+            if (state == NetworkState.CONNECTING) disableServices(false);
         });
     }
 
     private void initializeServices() {
-        disableServices();
+        disableServices(false);
 
         for (final AbstractServiceConfiguration configuration : configurations) {
             final AbstractService<?> service = ServiceFunctionRegistry.createService(configuration);

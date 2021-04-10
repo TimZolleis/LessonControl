@@ -36,12 +36,12 @@ public final class Network {
         kryo.register(LinkedHashSet.class);
 
         kryo.register(AbstractServiceConfiguration.class);
-        kryo.register(GeneralServiceConfiguration.class);
         kryo.register(VoicemeeterServiceConfiguration.class);
         kryo.register(VoicemeeterServiceConfiguration.AntiHowl.class);
         kryo.register(ButtonServiceConfiguration.class);
-        kryo.register(ButtonServiceConfiguration.Button.class);
+        kryo.register(ButtonServiceConfiguration.StripButton.class);
         kryo.register(OBSServiceConfiguration.class);
+        kryo.register(OBSServiceConfiguration.DocumentCamera.class);
 
         // Bound to client
         kryo.register(RegisterPacket.class);

@@ -1,5 +1,6 @@
 package de.waldorfaugsburg.lessoncontrol.client.service.obs;
 
+import de.waldorfaugsburg.lessoncontrol.client.LessonControlClientApplication;
 import de.waldorfaugsburg.lessoncontrol.client.service.AbstractService;
 import de.waldorfaugsburg.lessoncontrol.common.service.OBSServiceConfiguration;
 import de.waldorfaugsburg.lessoncontrol.common.util.Scheduler;
@@ -24,8 +25,8 @@ public final class OBSService extends AbstractService<OBSServiceConfiguration> {
     private OBSRemoteController controller;
     private boolean connected;
 
-    public OBSService(final OBSServiceConfiguration configuration) {
-        super(configuration);
+    public OBSService(final LessonControlClientApplication application, final OBSServiceConfiguration configuration) {
+        super(application, configuration);
     }
 
     @Override
@@ -33,28 +34,40 @@ public final class OBSService extends AbstractService<OBSServiceConfiguration> {
         cameraTask = Scheduler.schedule(() -> {
             if (!connected) return;
 
+            // Check if camera is known or was plugged-in previously
             final List<UsbDevice> devices = WindowsUsbDevice.getUsbDevices(false);
             if (lastDevices != null) {
                 for (final UsbDevice device : devices) {
-                    if (getConfiguration().getRestartingCameras().contains(device.getName()) && isUnknown(device.getName())) {
+                    if (getConfiguration().getDocumentCamera().getCamera().equals(device.getName()) && isUnknown(device.getName())) {
                         restart();
                     }
                 }
             }
             lastDevices = devices;
+
+            // Set source visibility
+            final OBSServiceConfiguration.DocumentCamera documentCamera = getConfiguration().getDocumentCamera();
+            final boolean visibility = !isUnknown(documentCamera.getCamera());
+            controller.setSourceVisibility(documentCamera.getScene(), documentCamera.getSource(), visibility, r -> {
+            });
         }, 1000);
 
         start();
     }
 
     @Override
-    public void disable() {
+    public void disable(final boolean shutdown) {
         cameraTask.cancel(true);
         stop();
     }
 
     private void restart() {
         stop();
+        try {
+            Thread.sleep(1000);
+        } catch (final InterruptedException e) {
+            e.printStackTrace();
+        }
         start();
     }
 
@@ -65,18 +78,22 @@ public final class OBSService extends AbstractService<OBSServiceConfiguration> {
             log.error("An error occurred starting OBS", e);
         }
 
+        // Initialize OBS websocket
         controller = new OBSRemoteController("ws://localhost:4444", false);
         controller.registerConnectCallback(response -> connected = true);
-        controller.registerDisconnectCallback(() -> connected = false);
+        controller.registerDisconnectCallback(() -> {
+            connected = false;
+            // If we disconnect we want to kill OBS
+            try {
+                Runtime.getRuntime().exec("taskkill /F /T /IM obs64.exe");
+            } catch (final IOException e) {
+                log.error("An error occurred stopping OBS", e);
+            }
+        });
     }
 
     private void stop() {
         controller.disconnect();
-        try {
-            Runtime.getRuntime().exec("taskkill /F /T /IM obs64.exe");
-        } catch (final IOException e) {
-            log.error("An error occurred stopping OBS", e);
-        }
     }
 
     private boolean isUnknown(final String name) {

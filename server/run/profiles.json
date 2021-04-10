@@ -5,14 +5,9 @@
     {
       "name": "default",
       "files": {
-        "default/voicemeeter.xml": "C:/Users/linus/AppData/Roaming/voicemeeter.xml",
-        "default/wallpaper.jpg": "C:/FWA/wallpaper.jpg"
+        "default/voicemeeter.xml": "C:/Users/linus/AppData/Roaming/voicemeeter.xml"
       },
       "configurations": [
-        {
-          "type": "de.waldorfaugsburg.lessoncontrol.common.service.GeneralServiceConfiguration",
-          "wallpaperPath": "C:/FWA/wallpaper.jpg"
-        },
         {
           "type": "de.waldorfaugsburg.lessoncontrol.common.service.VoicemeeterServiceConfiguration",
           "configPath": "C:/Users/linus/AppData/Roaming/voicemeeter.xml",
@@ -27,31 +22,22 @@
         },
         {
           "type": "de.waldorfaugsburg.lessoncontrol.common.service.ButtonServiceConfiguration",
-          "rows": 1,
-          "columns": 3,
-          "buttons": [
+          "stripButtons": [
             {
-              "text": "Lehrer",
-              "textSize": 30,
-              "enabled": false
-            },
-            {
-              "text": "Schüler",
-              "textSize": 30,
-              "enabled": false
-            },
-            {
-              "text": "autom. Stummschaltung",
-              "textSize": 10,
-              "enabled": false
+              "label": "Lehrer",
+              "strip": 0,
+              "enabled": true
             }
           ]
         },
         {
           "type": "de.waldorfaugsburg.lessoncontrol.common.service.OBSServiceConfiguration",
-          "restartingCameras": [
-            "FHD Camera"
-          ]
+          "sceneCollection": "DefaultGross",
+          "documentCamera": {
+            "scene": "Dokumentenkamera",
+            "source": "DCAM",
+            "camera": "FHD Camera"
+          }
         }
       ]
     }

@@ -8,15 +8,13 @@ import java.util.Set;
 @NoArgsConstructor
 @Getter
 public final class ButtonServiceConfiguration extends AbstractServiceConfiguration {
-    private int rows;
-    private int columns;
-    private Set<Button> buttons;
+    private Set<StripButton> stripButtons;
 
     @NoArgsConstructor
     @Getter
-    public static final class Button {
-        private String text;
-        private int textSize;
+    public static final class StripButton {
+        private String label;
+        private int strip;
         private boolean enabled;
     }
 }

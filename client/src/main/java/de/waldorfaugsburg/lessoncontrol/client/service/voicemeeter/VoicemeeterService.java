@@ -1,5 +1,6 @@
 package de.waldorfaugsburg.lessoncontrol.client.service.voicemeeter;
 
+import de.waldorfaugsburg.lessoncontrol.client.LessonControlClientApplication;
 import de.waldorfaugsburg.lessoncontrol.client.service.AbstractService;
 import de.waldorfaugsburg.lessoncontrol.common.service.VoicemeeterServiceConfiguration;
 import de.waldorfaugsburg.lessoncontrol.common.util.Scheduler;
@@ -15,8 +16,8 @@ public final class VoicemeeterService extends AbstractService<VoicemeeterService
 
     private int lastInputDeviceNumber = -1;
 
-    public VoicemeeterService(final VoicemeeterServiceConfiguration configuration) {
-        super(configuration);
+    public VoicemeeterService(final LessonControlClientApplication application, final VoicemeeterServiceConfiguration configuration) {
+        super(application, configuration);
     }
 
     @Override
@@ -51,10 +52,8 @@ public final class VoicemeeterService extends AbstractService<VoicemeeterService
     }
 
     @Override
-    public void disable() {
-        //setAntiHowlEnabled(false);
+    public void disable(final boolean shutdown) {
         task.cancel(true);
-        Voicemeeter.setParameterFloat("Command.Shutdown", 1);
     }
 
     public boolean isAntiHowlEnabled() {
@@ -63,6 +62,7 @@ public final class VoicemeeterService extends AbstractService<VoicemeeterService
 
     public void setAntiHowlEnabled(final boolean antiHowlEnabled) {
         this.antiHowlEnabled = antiHowlEnabled;
+        this.antiHowlMute = false;
 
         if (!antiHowlEnabled) {
             muteStrips(false);

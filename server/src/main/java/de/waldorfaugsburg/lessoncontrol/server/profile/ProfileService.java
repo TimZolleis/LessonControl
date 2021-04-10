@@ -53,6 +53,7 @@ public final class ProfileService {
         device.getConnection().sendTCP(new TransferProfilePacket(profile.getInfo().getConfigurations(), chunkCount));
         for (final byte[] chunk : profile.getDataChunks()) {
             device.getConnection().sendTCP(new TransferFileChunkPacket(chunk));
+            busyWaitMicros(50);
         }
         log.info("Transferred '{}' chunks to '{}'", chunkCount, device.getName());
     }
@@ -67,5 +68,11 @@ public final class ProfileService {
 
     public Collection<Profile> getProfiles() {
         return profileMap.values();
+    }
+
+    private void busyWaitMicros(final long micros) {
+        final long waitUntil = System.nanoTime() + (micros * 1_000);
+        while (waitUntil > System.nanoTime()) {
+        }
     }
 }

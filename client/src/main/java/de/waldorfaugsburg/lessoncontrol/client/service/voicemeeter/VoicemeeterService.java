@@ -13,6 +13,8 @@ public final class VoicemeeterService extends AbstractService<VoicemeeterService
     private boolean antiHowlEnabled;
     private boolean antiHowlMute;
 
+    private int lastInputDeviceNumber = -1;
+
     public VoicemeeterService(final VoicemeeterServiceConfiguration configuration) {
         super(configuration);
     }
@@ -26,6 +28,15 @@ public final class VoicemeeterService extends AbstractService<VoicemeeterService
         setAntiHowlEnabled(getConfiguration().getAntiHowl().isEnabled());
 
         task = Scheduler.schedule(() -> {
+            final int currentInputDeviceNumber = Voicemeeter.getNumberOfInputDevices();
+            if (lastInputDeviceNumber != -1) {
+                if (currentInputDeviceNumber > lastInputDeviceNumber) {
+                    loadConfig();
+                    Voicemeeter.setParameterFloat("Command.Restart", 1);
+                }
+            }
+            lastInputDeviceNumber = currentInputDeviceNumber;
+
             if (antiHowlEnabled) {
                 final float volume = Voicemeeter.getLevel(0, getConfiguration().getAntiHowl().getMonitoredChannel());
                 if (volume >= 5 && !antiHowlMute) {
@@ -41,7 +52,7 @@ public final class VoicemeeterService extends AbstractService<VoicemeeterService
 
     @Override
     public void disable() {
-        setAntiHowlEnabled(false);
+        //setAntiHowlEnabled(false);
         task.cancel(true);
         Voicemeeter.setParameterFloat("Command.Shutdown", 1);
     }

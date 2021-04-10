@@ -6,12 +6,12 @@
       "name": "default",
       "files": {
         "default/voicemeeter.xml": "C:/Users/linus/AppData/Roaming/voicemeeter.xml",
-        "default/wallpaper.png": "C:/FWA/wallpaper.png"
+        "default/wallpaper.jpg": "C:/FWA/wallpaper.jpg"
       },
       "configurations": [
         {
           "type": "de.waldorfaugsburg.lessoncontrol.common.service.GeneralServiceConfiguration",
-          "wallpaperPath": "C:/FWA/wallpaper.png"
+          "wallpaperPath": "C:/FWA/wallpaper.jpg"
         },
         {
           "type": "de.waldorfaugsburg.lessoncontrol.common.service.VoicemeeterServiceConfiguration",

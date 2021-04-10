@@ -26,7 +26,6 @@ public final class NetworkClient {
     private final PacketDistributor<Connection> distributor = new PacketDistributor<>();
 
     private NetworkState state;
-
     private String lastAddress;
 
     public NetworkClient(final LessonControlClientApplication application) {
@@ -39,7 +38,7 @@ public final class NetworkClient {
         client.start();
 
         // Transmit system-resources
-        Scheduler.schedule(new SystemResourceTransmissionRunnable(this), 1000);
+        Scheduler.schedule(new SystemResourceTransmissionRunnable(this), 10000);
 
         // Registering internal receivers
         registerReceivers();

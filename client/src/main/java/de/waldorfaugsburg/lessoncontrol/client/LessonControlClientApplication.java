@@ -68,7 +68,7 @@ public final class LessonControlClientApplication {
     }
 
     public void disable() {
-
+        serviceManager.disableServices();
     }
 
     public void fatalError(final String title, final String message) {

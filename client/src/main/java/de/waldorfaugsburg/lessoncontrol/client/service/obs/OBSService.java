@@ -19,10 +19,10 @@ public final class OBSService extends AbstractService<OBSServiceConfiguration> {
     private static final String WORKING_DIRECTORY = "C:\\Program Files\\obs-studio\\bin\\64bit\\";
     private static final String EXECUTABLE_PATH = WORKING_DIRECTORY + "obs64.exe";
 
-    private OBSRemoteController controller;
     private ScheduledFuture<?> cameraTask;
     private List<UsbDevice> lastDevices;
-    private boolean running;
+    private OBSRemoteController controller;
+    private boolean connected;
 
     public OBSService(final OBSServiceConfiguration configuration) {
         super(configuration);
@@ -31,50 +31,52 @@ public final class OBSService extends AbstractService<OBSServiceConfiguration> {
     @Override
     public void enable() {
         cameraTask = Scheduler.schedule(() -> {
-            final List<UsbDevice> usbDevices = WindowsUsbDevice.getUsbDevices(false);
+            if (!connected) return;
+
+            final List<UsbDevice> devices = WindowsUsbDevice.getUsbDevices(false);
             if (lastDevices != null) {
-                for (final UsbDevice device : usbDevices) {
+                for (final UsbDevice device : devices) {
                     if (getConfiguration().getRestartingCameras().contains(device.getName()) && isUnknown(device.getName())) {
-                        restartOBS();
+                        restart();
                     }
                 }
             }
-            lastDevices = usbDevices;
+            lastDevices = devices;
         }, 1000);
 
-        startOBS();
-
-        controller = new OBSRemoteController("ws://localhost:4444", false);
-        controller.registerConnectCallback(response -> {
-
-
-            log.info("Successfully connected to OBS v{} via WS v{}", response.getObsStudioVersion(), response.getObsWebsocketVersion());
-        });
-    }
-
-    private void startOBS() {
-        try {
-            new ProcessBuilder(EXECUTABLE_PATH).directory(new File(WORKING_DIRECTORY)).start();
-            Thread.sleep(3000);
-        } catch (final IOException | InterruptedException e) {
-            log.error("An error occurred starting OBS", e);
-        }
-
-    }
-
-    private void restartOBS() {
-        try {
-            Runtime.getRuntime().exec("taskkill /F /T /IM obs64.exe");
-            startOBS();
-        } catch (final IOException e) {
-            log.error("An error occurred stopping OBS", e);
-        }
+        start();
     }
 
     @Override
     public void disable() {
         cameraTask.cancel(true);
+        stop();
+    }
+
+    private void restart() {
+        stop();
+        start();
+    }
+
+    private void start() {
+        try {
+            new ProcessBuilder(EXECUTABLE_PATH).directory(new File(WORKING_DIRECTORY)).start();
+        } catch (final IOException e) {
+            log.error("An error occurred starting OBS", e);
+        }
+
+        controller = new OBSRemoteController("ws://localhost:4444", false);
+        controller.registerConnectCallback(response -> connected = true);
+        controller.registerDisconnectCallback(() -> connected = false);
+    }
+
+    private void stop() {
         controller.disconnect();
+        try {
+            Runtime.getRuntime().exec("taskkill /F /T /IM obs64.exe");
+        } catch (final IOException e) {
+            log.error("An error occurred stopping OBS", e);
+        }
     }
 
     private boolean isUnknown(final String name) {

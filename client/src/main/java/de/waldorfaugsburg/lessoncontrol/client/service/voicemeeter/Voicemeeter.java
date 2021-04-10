@@ -55,6 +55,14 @@ public final class Voicemeeter {
         return (float) (20 * Math.log10(value) + 60);
     }
 
+    public static int getNumberOfInputDevices() {
+        return instance.VBVMR_Input_GetDeviceNumber();
+    }
+
+    public static int getNumberOfOutputDevices() {
+        return instance.VBVMR_Output_GetDeviceNumber();
+    }
+
     private static Pointer getStringPointer(final String string) {
         final int size = string.getBytes().length + 1;
         final Memory memory = new Memory(size);

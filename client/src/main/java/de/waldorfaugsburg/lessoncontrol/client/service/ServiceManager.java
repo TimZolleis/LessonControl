@@ -2,6 +2,8 @@ package de.waldorfaugsburg.lessoncontrol.client.service;
 
 import de.waldorfaugsburg.lessoncontrol.client.LessonControlClientApplication;
 import de.waldorfaugsburg.lessoncontrol.client.network.NetworkClient;
+import de.waldorfaugsburg.lessoncontrol.client.network.NetworkListener;
+import de.waldorfaugsburg.lessoncontrol.client.network.NetworkState;
 import de.waldorfaugsburg.lessoncontrol.client.profile.FileTransferListener;
 import de.waldorfaugsburg.lessoncontrol.client.service.button.ButtonService;
 import de.waldorfaugsburg.lessoncontrol.client.service.general.GeneralService;
@@ -35,23 +37,29 @@ public final class ServiceManager {
         registerListeners();
     }
 
+    public void disableServices() {
+        for (final AbstractService<?> service : serviceMap.values()) {
+            try {
+                service.disable();
+                log.info("Disabled service '{}'", service.getClass().getSimpleName());
+            } catch (final Exception e) {
+                log.error("An error occurred disabling service '{}'", service.getClass().getSimpleName(), e);
+            }
+        }
+        serviceMap.clear();
+    }
+
     private void registerListeners() {
         final NetworkClient networkClient = application.getNetworkClient();
         networkClient.getDistributor().addListener(TransferProfilePacket.class, (connection, packet) -> this.configurations = packet.getServiceConfigurations());
         application.getEventDistributor().addListener(FileTransferListener.class, this::initializeServices);
+        application.getEventDistributor().addListener(NetworkListener.class, state -> {
+            if (state == NetworkState.CONNECTING) disableServices();
+        });
     }
 
     private void initializeServices() {
-        if (!serviceMap.isEmpty()) {
-            for (final AbstractService<?> service : serviceMap.values()) {
-                try {
-                    service.disable();
-                    log.info("Disabled service '{}'", service.getClass().getSimpleName());
-                } catch (final Exception e) {
-                    log.error("An error occurred disabling service '{}'", service.getClass().getSimpleName());
-                }
-            }
-        }
+        disableServices();
 
         for (final AbstractServiceConfiguration configuration : configurations) {
             final AbstractService<?> service = ServiceFunctionRegistry.createService(configuration);
@@ -61,7 +69,7 @@ public final class ServiceManager {
                 service.enable();
                 log.info("Enabled service '{}'", service.getClass().getSimpleName());
             } catch (final Exception e) {
-                log.error("An error occurred enabling service '{}'", service.getClass().getSimpleName());
+                log.error("An error occurred enabling service '{}'", service.getClass().getSimpleName(), e);
             }
         }
     }

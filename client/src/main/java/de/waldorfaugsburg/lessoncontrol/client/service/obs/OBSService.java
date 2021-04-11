@@ -35,7 +35,7 @@ public final class OBSService extends AbstractService<OBSServiceConfiguration> {
             if (!connected) return;
 
             // Check if camera is known or was plugged-in previously
-            final List<UsbDevice> devices = WindowsUsbDevice.getUsbDevices(false);
+            final List<UsbDevice> devices = WindowsUsbDevice.getUsbDevices (true);
             if (lastDevices != null) {
                 for (final UsbDevice device : devices) {
                     if (getConfiguration().getDocumentCamera().getCamera().equals(device.getName()) && isUnknown(device.getName())) {

@@ -22,16 +22,22 @@ public final class VoicemeeterService extends AbstractService<VoicemeeterService
 
     @Override
     public void enable() {
-        Voicemeeter.init();
-        Voicemeeter.runVoicemeeter();
+        try {
+            Thread.sleep(5000);
+        } catch (final InterruptedException ignored) {
+        }
 
+        Voicemeeter.init();
         loadConfig();
         setAntiHowlEnabled(getConfiguration().getAntiHowl().isEnabled());
 
         task = Scheduler.schedule(() -> {
             final int currentInputDeviceNumber = Voicemeeter.getNumberOfInputDevices();
+            System.out.println("currentInputDeviceNumber: " + currentInputDeviceNumber);
             if (lastInputDeviceNumber != -1) {
+                System.out.println("lastInputDeviceNumber != -1");
                 if (currentInputDeviceNumber > lastInputDeviceNumber) {
+                    System.out.println(currentInputDeviceNumber + ">" + lastInputDeviceNumber);
                     loadConfig();
                     Voicemeeter.setParameterFloat("Command.Restart", 1);
                 }

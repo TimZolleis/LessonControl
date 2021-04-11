@@ -22,11 +22,9 @@ public final class SplashManager {
 
     private void registerReceivers() {
         application.getEventDistributor().addListener(NetworkListener.class, state -> {
-            if (state == NetworkState.CONNECTING || state == NetworkState.CONNECTED || state == NetworkState.READY) {
-                splash(state.getMessage());
-                if (state == NetworkState.READY) {
-                    Scheduler.runLater(this::dispose, 5000);
-                }
+            splash(state.getMessage());
+            if (state == NetworkState.READY) {
+                Scheduler.runLater(this::dispose, 5000);
             }
         });
     }

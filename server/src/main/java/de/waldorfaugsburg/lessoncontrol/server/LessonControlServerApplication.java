@@ -5,8 +5,6 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.stream.JsonReader;
 import de.waldorfaugsburg.lessoncontrol.common.event.EventDistributor;
 import de.waldorfaugsburg.lessoncontrol.common.service.AbstractServiceConfiguration;
-import de.waldorfaugsburg.lessoncontrol.server.config.DeviceConfiguration;
-import de.waldorfaugsburg.lessoncontrol.server.config.ProfileConfiguration;
 import de.waldorfaugsburg.lessoncontrol.server.config.ServerConfiguration;
 import de.waldorfaugsburg.lessoncontrol.server.util.JsonAdapter;
 import org.springframework.boot.SpringApplication;

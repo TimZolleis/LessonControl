@@ -41,6 +41,7 @@ public final class ButtonService extends AbstractService<ButtonServiceConfigurat
         }
         dialog.add(createButton("autom. Stummschaltung", 15, true, service::setAntiHowlEnabled));
         dialog.setUndecorated(true);
+        dialog.setOpacity(DEFAULT_OPACITY);
         dialog.setResizable(false);
         dialog.setAlwaysOnTop(true);
         dialog.setModalityType(Dialog.ModalityType.APPLICATION_MODAL);

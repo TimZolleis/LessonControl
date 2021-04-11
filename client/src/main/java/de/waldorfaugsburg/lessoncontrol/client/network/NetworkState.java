@@ -4,9 +4,9 @@ public enum NetworkState {
 
     CONNECTING("Verbinde ..."),
     FAILED("Fehlgeschlagen!"),
-    CONNECTED("Verbunden!"),
+    CONNECTED("Verbunden! Vorbereitung läuft ..."),
     READY("Bereit!"),
-    ERROR("Fehler!");
+    ERROR("Fehler! Bitte wenden Sie sich an den Support!");
 
     private final String message;
 

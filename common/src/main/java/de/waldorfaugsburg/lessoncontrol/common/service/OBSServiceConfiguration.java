@@ -4,18 +4,27 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.Set;
+
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 public final class OBSServiceConfiguration extends AbstractServiceConfiguration {
-    private String sceneCollection;
-    private DocumentCamera documentCamera;
+    private String collection;
+    private String profile;
+    private Set<MonitoredCamera> monitoredCameras;
 
     @NoArgsConstructor
     @Getter
-    public static final class DocumentCamera {
+    public static final class MonitoredCamera {
+        private String name;
+        private SourceVisibility visibility;
+    }
+
+    @NoArgsConstructor
+    @Getter
+    public static final class SourceVisibility {
         private String scene;
         private String source;
-        private String camera;
     }
 }

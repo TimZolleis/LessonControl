@@ -2,19 +2,22 @@ package de.waldorfaugsburg.lessoncontrol.client.service.voicemeeter;
 
 import de.waldorfaugsburg.lessoncontrol.client.LessonControlClientApplication;
 import de.waldorfaugsburg.lessoncontrol.client.service.AbstractService;
+import de.waldorfaugsburg.lessoncontrol.client.usb.UsbListener;
+import de.waldorfaugsburg.lessoncontrol.client.util.CommandExecutionUtil;
 import de.waldorfaugsburg.lessoncontrol.common.service.VoicemeeterServiceConfiguration;
 import de.waldorfaugsburg.lessoncontrol.common.util.Scheduler;
+import lombok.extern.slf4j.Slf4j;
+import oshi.hardware.UsbDevice;
 
 import java.io.File;
 import java.util.concurrent.ScheduledFuture;
 
+@Slf4j
 public final class VoicemeeterService extends AbstractService<VoicemeeterServiceConfiguration> {
 
     private ScheduledFuture<?> task;
     private boolean antiHowlEnabled;
     private boolean antiHowlMute;
-
-    private int lastInputDeviceNumber = -1;
 
     public VoicemeeterService(final LessonControlClientApplication application, final VoicemeeterServiceConfiguration configuration) {
         super(application, configuration);
@@ -22,28 +25,24 @@ public final class VoicemeeterService extends AbstractService<VoicemeeterService
 
     @Override
     public void enable() {
+        CommandExecutionUtil.run(new File(Voicemeeter.WORKING_DIRECTORY), Voicemeeter.EXECUTABLE_PATH);
         try {
-            Thread.sleep(5000);
+            Thread.sleep(6000);
         } catch (final InterruptedException ignored) {
         }
-
         Voicemeeter.init();
         loadConfig();
         setAntiHowlEnabled(getConfiguration().getAntiHowl().isEnabled());
-
-        task = Scheduler.schedule(() -> {
-            final int currentInputDeviceNumber = Voicemeeter.getNumberOfInputDevices();
-            System.out.println("currentInputDeviceNumber: " + currentInputDeviceNumber);
-            if (lastInputDeviceNumber != -1) {
-                System.out.println("lastInputDeviceNumber != -1");
-                if (currentInputDeviceNumber > lastInputDeviceNumber) {
-                    System.out.println(currentInputDeviceNumber + ">" + lastInputDeviceNumber);
+        getApplication().getEventDistributor().addListener(UsbListener.class, new UsbListener() {
+            @Override
+            public void deviceConnected(final UsbDevice device) {
+                if (getConfiguration().getMonitoredDevices().contains(device.getName())) {
                     loadConfig();
                     Voicemeeter.setParameterFloat("Command.Restart", 1);
                 }
             }
-            lastInputDeviceNumber = currentInputDeviceNumber;
-
+        });
+        task = Scheduler.schedule(() -> {
             if (antiHowlEnabled) {
                 final float volume = Voicemeeter.getLevel(0, getConfiguration().getAntiHowl().getMonitoredChannel());
                 if (volume >= 5 && !antiHowlMute) {

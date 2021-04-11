@@ -4,9 +4,13 @@ import com.sun.jna.Memory;
 import com.sun.jna.Native;
 import com.sun.jna.Pointer;
 
+import java.io.File;
+
 public final class Voicemeeter {
 
-    private static final String DLL_PATH = "C:\\Program Files (x86)\\VB\\Voicemeeter\\VoicemeeterRemote64.dll";
+    public static final String WORKING_DIRECTORY = "C:\\Program Files (x86)\\VB\\Voicemeeter\\";
+    public static final String EXECUTABLE_PATH = WORKING_DIRECTORY + "voicemeeter.exe";
+    public static final String DLL_PATH = "C:\\Program Files (x86)\\VB\\Voicemeeter\\VoicemeeterRemote64.dll";
 
     private static VoicemeeterInstance instance;
     private static boolean initialized;
@@ -22,15 +26,6 @@ public final class Voicemeeter {
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> instance.VBVMR_Logout()));
         initialized = true;
-    }
-
-    public static void runVoicemeeter() {
-        final int response = instance.VBVMR_RunVoicemeeter(1);
-        if (response != 0) throw new VoicemeeterException("Invalid response: " + response);
-        try {
-            Thread.sleep(1000);
-        } catch (final InterruptedException ignored) {
-        }
     }
 
     public static void setParameterFloat(final String name, final float value) {

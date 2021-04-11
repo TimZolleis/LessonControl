@@ -38,19 +38,17 @@ public final class DeviceCommands {
         log.info("All devices ({}):", devices.size());
         final AsciiTable table = new AsciiTable(new AT_Context().setWidth(150));
         table.addRule();
-        table.addRow("Name", "Location", "Profile", "Connected", "CPU", "Memory");
+        table.addRow("Name", "Connected", "CPU", "Memory");
         table.addRule();
         table.setTextAlignment(TextAlignment.CENTER);
         devices.forEach(device -> {
             if (device.isConnected()) {
                 table.addRow(device.getName(),
-                        device.getInfo().getLocation(),
-                        device.getInfo().getProfile(),
                         "YES (" + DateFormatUtils.format(device.getConnectedAt(), "dd.MM. HH:mm") + ")",
                         DECIMAL_FORMAT.format(device.getLoad()) + " %",
                         formatMemory(device.getTotalMemory(), device.getFreeMemory()));
             } else {
-                table.addRow(device.getName(), device.getInfo().getLocation(), device.getInfo().getProfile(), "NO", "", "");
+                table.addRow(device.getName(), "NO", "", "");
             }
             table.addRule();
         });

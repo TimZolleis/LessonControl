@@ -9,6 +9,7 @@ import de.waldorfaugsburg.lessoncontrol.client.profile.ProfileManager;
 import de.waldorfaugsburg.lessoncontrol.client.service.ServiceManager;
 import de.waldorfaugsburg.lessoncontrol.client.splash.SplashManager;
 import de.waldorfaugsburg.lessoncontrol.client.tray.TrayManager;
+import de.waldorfaugsburg.lessoncontrol.client.usb.UsbManager;
 import de.waldorfaugsburg.lessoncontrol.common.event.EventDistributor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -33,6 +34,7 @@ public final class LessonControlClientApplication {
 
     private NetworkClient networkClient;
     private ProfileManager profileManager;
+    private UsbManager usbManager;
     private ServiceManager serviceManager;
     private TrayManager trayManager;
     private SplashManager splashManager;
@@ -60,6 +62,7 @@ public final class LessonControlClientApplication {
         // Initialize services
         networkClient = new NetworkClient(this);
         profileManager = new ProfileManager(this);
+        usbManager = new UsbManager(this);
         serviceManager = new ServiceManager(this);
         trayManager = new TrayManager(this);
         splashManager = new SplashManager(this);
@@ -106,6 +109,10 @@ public final class LessonControlClientApplication {
 
     public ProfileManager getProfileManager() {
         return profileManager;
+    }
+
+    public UsbManager getUsbManager() {
+        return usbManager;
     }
 
     public ServiceManager getServiceManager() {

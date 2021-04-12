@@ -18,6 +18,7 @@ public final class VoicemeeterService extends AbstractService<VoicemeeterService
     private ScheduledFuture<?> task;
     private boolean antiHowlEnabled;
     private boolean antiHowlMute;
+    private int lastInputDeviceNumber = -1;
 
     public VoicemeeterService(final LessonControlClientApplication application, final VoicemeeterServiceConfiguration configuration) {
         super(application, configuration);
@@ -35,11 +36,15 @@ public final class VoicemeeterService extends AbstractService<VoicemeeterService
         setAntiHowlEnabled(getConfiguration().getAntiHowl().isEnabled());
         getApplication().getEventDistributor().addListener(UsbListener.class, new UsbListener() {
             @Override
-            public void deviceConnected(final UsbDevice device) {
-                if (getConfiguration().getMonitoredDevices().contains(device.getName())) {
-                    loadConfig();
-                    Voicemeeter.setParameterFloat("Command.Restart", 1);
+            public void devicesChecked() {
+                final int currentInputDeviceNumber = Voicemeeter.getNumberOfInputDevices();
+                if (lastInputDeviceNumber != -1) {
+                    if (currentInputDeviceNumber > lastInputDeviceNumber) {
+                        loadConfig();
+                        Voicemeeter.setParameterFloat("Command.Restart", 1);
+                    }
                 }
+                lastInputDeviceNumber = currentInputDeviceNumber;
             }
         });
         task = Scheduler.schedule(() -> {

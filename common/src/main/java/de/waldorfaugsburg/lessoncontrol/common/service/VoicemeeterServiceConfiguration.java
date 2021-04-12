@@ -9,7 +9,6 @@ import java.util.Set;
 @Getter
 public final class VoicemeeterServiceConfiguration extends AbstractServiceConfiguration {
     private String configPath;
-    private Set<String> monitoredDevices;
     private AntiHowl antiHowl;
 
     @NoArgsConstructor

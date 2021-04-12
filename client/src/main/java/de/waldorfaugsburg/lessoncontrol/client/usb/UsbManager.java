@@ -12,10 +12,14 @@ import java.util.List;
 public final class UsbManager {
 
     private List<UsbDevice> lastDevices;
+    private List<UsbDevice> checkDevices;
 
     public UsbManager(final LessonControlClientApplication application) {
         Scheduler.schedule(() -> {
             final List<UsbDevice> devices = WindowsUsbDevice.getUsbDevices(false);
+            checkDevices = devices;
+            application.getEventDistributor().call(UsbListener.class, UsbListener::devicesChecked);
+
             if (lastDevices != null) {
                 for (final UsbDevice device : lastDevices) {
                     if (!containsDevice(devices, device.getName())) {
@@ -35,7 +39,7 @@ public final class UsbManager {
     }
 
     public boolean isConnected(final String deviceName) {
-        return containsDevice(lastDevices, deviceName);
+        return containsDevice(checkDevices, deviceName);
     }
 
     private boolean containsDevice(final List<UsbDevice> devices, final String deviceName) {

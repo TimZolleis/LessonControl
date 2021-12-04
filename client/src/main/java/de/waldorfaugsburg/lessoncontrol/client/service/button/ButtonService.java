@@ -8,11 +8,12 @@ import de.waldorfaugsburg.lessoncontrol.common.service.ButtonServiceConfiguratio
 import de.waldorfaugsburg.lessoncontrol.common.util.Scheduler;
 
 import javax.swing.*;
+import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
-import java.util.function.Consumer;
+import java.util.function.BiConsumer;
 
 public final class ButtonService extends AbstractService<ButtonServiceConfiguration> {
 
@@ -35,13 +36,19 @@ public final class ButtonService extends AbstractService<ButtonServiceConfigurat
     @Override
     public void enable() {
         dialog = new JDialog();
-        dialog.setLayout(new GridLayout(1, getConfiguration().getStripButtons().size()));
+        dialog.setLayout(new GridLayout(3, getConfiguration().getStripButtons().size()));
         for (final ButtonServiceConfiguration.StripButton button : getConfiguration().getStripButtons()) {
             dialog.add(createStripButton(button));
         }
-        dialog.add(createButton("autom. Stummschaltung", 15, true, service::setAntiHowlEnabled));
+        for (final ButtonServiceConfiguration.ProfileButton button : getConfiguration().getProfileButtons()) {
+            dialog.add(createProfileButton(button));
+        }
+        final JToggleButton antiHowlButton = createButton("Rückkopplungsvermeidung", 15, true, (b, enabled) -> service.setAntiHowlEnabled(enabled));
+        service.addAntiHowlListener(antiHowlButton::setBorderPainted);
+        dialog.add(antiHowlButton);
+        dialog.add(createButton("Störgeräuschvermeidung", 15, true, (b, enabled) -> service.setNoiseReductionEnabled(enabled)));
         dialog.setUndecorated(true);
-        dialog.setOpacity(DEFAULT_OPACITY);
+        dialog.setOpacity(getConfiguration().isChangeOpacity() ? DEFAULT_OPACITY : FULL_OPACITY);
         dialog.setResizable(false);
         dialog.setAlwaysOnTop(true);
         dialog.setModalityType(Dialog.ModalityType.APPLICATION_MODAL);
@@ -56,13 +63,30 @@ public final class ButtonService extends AbstractService<ButtonServiceConfigurat
     }
 
     private JToggleButton createStripButton(final ButtonServiceConfiguration.StripButton button) {
-        return createButton(button.getLabel(), 30, button.isEnabled(),
-                enabled -> Voicemeeter.setParameterFloat("Strip(" + button.getStrip() + ").Mute", enabled ? 0 : 1));
+        final JToggleButton javaButton = createButton(button.getLabel(), 30, button.isEnabled(),
+                (b, enabled) -> Voicemeeter.setParameterFloat("Strip(" + button.getStrip() + ").Mute", enabled ? 0 : 1));
+
+        service.addMuteListener(button.getStrip(), muted -> javaButton.setBorderPainted(!muted));
+        return javaButton;
     }
 
-    private JToggleButton createButton(final String label, final int textSize, final boolean enabled, final Consumer<Boolean> toggleListener) {
+    private JToggleButton createProfileButton(final ButtonServiceConfiguration.ProfileButton button) {
+        final JToggleButton profileButton = createButton(button.getLabel(), 30, true, (b, enabled) -> {
+            b.setBackground(Color.CYAN);
+            Voicemeeter.setParameterFloat("Strip(2).EQGain1", button.getBass());
+            Voicemeeter.setParameterFloat("Strip(2).EQGain2", button.getMedium());
+            Voicemeeter.setParameterFloat("Strip(2).EQGain3", button.getHigh());
+            Voicemeeter.setParameterFloat("Strip(2).Gain", button.getGain());
+        });
+        profileButton.setBackground(Color.CYAN);
+        return profileButton;
+    }
+
+    private JToggleButton createButton(final String label, final int textSize, final boolean enabled, final BiConsumer<JToggleButton, Boolean> toggleListener) {
         final JToggleButton toggleButton = new JToggleButton(label, enabled);
         toggleButton.setFont(new Font("Arial", Font.BOLD, textSize));
+        toggleButton.setBorder(new LineBorder(Color.YELLOW, 10, false));
+        toggleButton.setBorderPainted(false);
         toggleButton.setContentAreaFilled(false);
         toggleButton.setOpaque(true);
         toggleButton.addMouseListener(new MouseAdapter() {
@@ -86,12 +110,12 @@ public final class ButtonService extends AbstractService<ButtonServiceConfigurat
 
             @Override
             public void mouseEntered(final MouseEvent event) {
-                dialog.setOpacity(FULL_OPACITY);
+                if (getConfiguration().isChangeOpacity()) dialog.setOpacity(FULL_OPACITY);
             }
 
             @Override
             public void mouseExited(final MouseEvent event) {
-                dialog.setOpacity(DEFAULT_OPACITY);
+                if (getConfiguration().isChangeOpacity()) dialog.setOpacity(DEFAULT_OPACITY);
             }
         });
         toggleButton.addMouseMotionListener(new MouseMotionAdapter() {
@@ -104,9 +128,9 @@ public final class ButtonService extends AbstractService<ButtonServiceConfigurat
         return toggleButton;
     }
 
-    private void handleButtonAction(final JToggleButton button, final Consumer<Boolean> consumer) {
-        consumer.accept(button.isSelected());
+    private void handleButtonAction(final JToggleButton button, final BiConsumer<JToggleButton, Boolean> consumer) {
         updateButtonColor(button);
+        consumer.accept(button, button.isSelected());
     }
 
     private void updateButtonColor(final JToggleButton button) {

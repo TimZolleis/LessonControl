@@ -14,7 +14,6 @@ public final class DenyPacket extends Packet {
 
     public enum Reason {
         OUTDATED_CLIENT,
-        UNKNOWN_DEVICE,
-        UNKNOWN_PROFILE
+        UNKNOWN_DEVICE
     }
 }

@@ -48,7 +48,7 @@ public final class NetworkServer {
 
         // Bind address
         try {
-            final InetSocketAddress address = new InetSocketAddress(InetAddress.getLocalHost(), configuration.getPort());
+            final InetSocketAddress address = new InetSocketAddress(configuration.getAddress(), configuration.getPort());
             server.bind(address, null);
             log.info("TCP-Server started! Listening for connections on '{}'", address.getAddress().getHostAddress() + ":" + configuration.getPort());
         } catch (final IOException e) {

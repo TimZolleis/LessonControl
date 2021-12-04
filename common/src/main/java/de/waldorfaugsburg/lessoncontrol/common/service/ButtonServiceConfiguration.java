@@ -9,6 +9,8 @@ import java.util.Set;
 @Getter
 public final class ButtonServiceConfiguration extends AbstractServiceConfiguration {
     private Set<StripButton> stripButtons;
+    private Set<ProfileButton> profileButtons;
+    private boolean changeOpacity;
 
     @NoArgsConstructor
     @Getter
@@ -16,5 +18,15 @@ public final class ButtonServiceConfiguration extends AbstractServiceConfigurati
         private String label;
         private int strip;
         private boolean enabled;
+    }
+
+    @NoArgsConstructor
+    @Getter
+    public static final class ProfileButton {
+        private String label;
+        private float bass;
+        private float medium;
+        private float high;
+        private float gain;
     }
 }

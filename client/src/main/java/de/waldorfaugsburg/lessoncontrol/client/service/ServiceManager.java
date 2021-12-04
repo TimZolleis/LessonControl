@@ -54,7 +54,7 @@ public final class ServiceManager {
         final NetworkClient networkClient = application.getNetworkClient();
         networkClient.getDistributor().addListener(TransferProfilePacket.class, (connection, packet) -> this.configurations = packet.getServiceConfigurations());
         application.getEventDistributor().addListener(FileTransferListener.class, this::initializeServices);
-        application.getEventDistributor().addListener(NetworkListener.class, state -> {
+        application.getEventDistributor().addListener(NetworkListener.class, (previousState, state) -> {
             if (state == NetworkState.CONNECTING) disableServices(false);
         });
     }

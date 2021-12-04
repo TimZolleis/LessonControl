@@ -16,7 +16,7 @@ import java.util.Set;
 
 public final class Network {
 
-    public static final int PROTOCOL_VERSION = 2;
+    public static final int PROTOCOL_VERSION = 3;
     public static final int FILE_CHUNK_SIZE = 1024;
 
     static {
@@ -32,14 +32,17 @@ public final class Network {
         // General
         kryo.register(byte[].class);
         kryo.register(int[].class);
+        kryo.register(float.class);
         kryo.register(Set.class);
         kryo.register(LinkedHashSet.class);
 
         kryo.register(AbstractServiceConfiguration.class);
         kryo.register(VoicemeeterServiceConfiguration.class);
+        kryo.register(VoicemeeterServiceConfiguration.NoiseReduction.class);
         kryo.register(VoicemeeterServiceConfiguration.AntiHowl.class);
         kryo.register(ButtonServiceConfiguration.class);
         kryo.register(ButtonServiceConfiguration.StripButton.class);
+        kryo.register(ButtonServiceConfiguration.ProfileButton.class);
         kryo.register(OBSServiceConfiguration.class);
         kryo.register(OBSServiceConfiguration.MonitoredCamera.class);
         kryo.register(OBSServiceConfiguration.SourceVisibility.class);

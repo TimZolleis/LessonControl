@@ -21,9 +21,6 @@ import java.util.List;
 @ShellCommandGroup("Device Commands")
 public final class DeviceCommands {
 
-    private static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("0.00");
-    private static final int GB = 1024 * 1024 * 1024;
-
     private final DeviceService service;
 
     public DeviceCommands(final DeviceService service) {
@@ -38,24 +35,18 @@ public final class DeviceCommands {
         log.info("All devices ({}):", devices.size());
         final AsciiTable table = new AsciiTable(new AT_Context().setWidth(150));
         table.addRule();
-        table.addRow("Name", "Connected", "CPU", "Memory");
+        table.addRow("Name", "Connected");
         table.addRule();
         table.setTextAlignment(TextAlignment.CENTER);
         devices.forEach(device -> {
             if (device.isConnected()) {
                 table.addRow(device.getName(),
-                        "YES (" + DateFormatUtils.format(device.getConnectedAt(), "dd.MM. HH:mm") + ")",
-                        DECIMAL_FORMAT.format(device.getLoad()) + " %",
-                        formatMemory(device.getTotalMemory(), device.getFreeMemory()));
+                        "YES (" + DateFormatUtils.format(device.getConnectedAt(), "dd.MM. HH:mm") + ")");
             } else {
-                table.addRow(device.getName(), "NO", "", "");
+                table.addRow(device.getName(), "NO");
             }
             table.addRule();
         });
         return table.render();
-    }
-
-    private String formatMemory(final long totalMemory, final long freeMemory) {
-        return ((totalMemory - freeMemory) / GB) + " GB / " + (totalMemory / GB) + " GB";
     }
 }

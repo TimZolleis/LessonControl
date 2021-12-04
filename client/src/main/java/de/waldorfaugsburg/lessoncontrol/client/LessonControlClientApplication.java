@@ -7,7 +7,6 @@ import de.waldorfaugsburg.lessoncontrol.client.config.ClientConfiguration;
 import de.waldorfaugsburg.lessoncontrol.client.network.NetworkClient;
 import de.waldorfaugsburg.lessoncontrol.client.profile.ProfileManager;
 import de.waldorfaugsburg.lessoncontrol.client.service.ServiceManager;
-import de.waldorfaugsburg.lessoncontrol.client.splash.SplashManager;
 import de.waldorfaugsburg.lessoncontrol.client.tray.TrayManager;
 import de.waldorfaugsburg.lessoncontrol.client.usb.UsbManager;
 import de.waldorfaugsburg.lessoncontrol.common.event.EventDistributor;
@@ -37,7 +36,6 @@ public final class LessonControlClientApplication {
     private UsbManager usbManager;
     private ServiceManager serviceManager;
     private TrayManager trayManager;
-    private SplashManager splashManager;
 
     public void enable() {
         try {
@@ -65,7 +63,6 @@ public final class LessonControlClientApplication {
         usbManager = new UsbManager(this);
         serviceManager = new ServiceManager(this);
         trayManager = new TrayManager(this);
-        splashManager = new SplashManager(this);
 
         networkClient.connect();
     }
@@ -121,10 +118,6 @@ public final class LessonControlClientApplication {
 
     public TrayManager getTrayManager() {
         return trayManager;
-    }
-
-    public SplashManager getSplashManager() {
-        return splashManager;
     }
 
     private ClientConfiguration parseConfiguration() throws IOException {

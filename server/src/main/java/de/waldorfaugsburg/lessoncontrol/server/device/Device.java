@@ -22,9 +22,6 @@ public final class Device {
 
     private DeviceConnection connection;
     private long connectedAt;
-    private long totalMemory;
-    private long freeMemory;
-    private double load;
     private byte[][] dataChunks;
 
     public Device(final DeviceConfiguration configuration, final DeviceConfiguration.DeviceInfo info) {
@@ -34,24 +31,15 @@ public final class Device {
     }
 
     public void handleConnect(final DeviceConnection connection, final RegisterPacket packet) {
-        this.totalMemory = packet.getTotalMemory();
         this.connectedAt = System.currentTimeMillis();
 
         // We're connected after setting this field
         this.connection = connection;
     }
 
-    public void updateSystemResources(final long freeMemory, final double load) {
-        this.freeMemory = freeMemory;
-        this.load = load;
-    }
-
     public void handleDisconnect() {
         // We disconnect by nulling connection; then reset data fields
         this.connection = null;
-
-        this.totalMemory = this.freeMemory = 0;
-        this.load = 0D;
     }
 
     private void convertAndCacheFiles() {
@@ -130,18 +118,6 @@ public final class Device {
 
     public long getConnectedAt() {
         return connectedAt;
-    }
-
-    public long getTotalMemory() {
-        return totalMemory;
-    }
-
-    public long getFreeMemory() {
-        return freeMemory;
-    }
-
-    public double getLoad() {
-        return load;
     }
 
     public byte[][] getDataChunks() {

@@ -2,6 +2,7 @@ package de.waldorfaugsburg.lessoncontrol.client.tray;
 
 import de.waldorfaugsburg.lessoncontrol.client.LessonControlClientApplication;
 import de.waldorfaugsburg.lessoncontrol.client.network.NetworkListener;
+import de.waldorfaugsburg.lessoncontrol.client.network.NetworkState;
 import lombok.extern.slf4j.Slf4j;
 
 import java.awt.*;
@@ -13,17 +14,21 @@ import java.io.IOException;
 public final class TrayManager {
 
     private final LessonControlClientApplication application;
+    private final Image defaultImage;
+    private final Image errorImage;
+
     private TrayIcon trayIcon;
 
     public TrayManager(final LessonControlClientApplication application) {
         this.application = application;
+        this.defaultImage = Toolkit.getDefaultToolkit().createImage(getClass().getResource("/tray.png"));
+        this.errorImage = Toolkit.getDefaultToolkit().createImage(getClass().getResource("/tray_red.png"));
 
         initialize();
     }
 
     private void initialize() {
-        final Image trayImage = Toolkit.getDefaultToolkit().createImage(getClass().getResource("/tray.png"));
-        trayIcon = new TrayIcon(trayImage);
+        trayIcon = new TrayIcon(defaultImage);
         trayIcon.setImageAutoSize(true);
 
         final PopupMenu menu = new PopupMenu();
@@ -42,7 +47,13 @@ public final class TrayManager {
             log.error("An error occurred while adding tray icon", e);
         }
 
-        application.getEventDistributor().addListener(NetworkListener.class, state -> {
+        application.getEventDistributor().addListener(NetworkListener.class, (previousState, state) -> {
+            if (!previousState.isRed() && state.isRed()) {
+                trayIcon.setImage(errorImage);
+            } else if(previousState.isRed() && !state.isRed()) {
+                trayIcon.setImage(defaultImage);
+            }
+
             statusItem.setLabel(state.getMessage());
             trayIcon.setToolTip("LessonControl\n" + state.getMessage());
         });

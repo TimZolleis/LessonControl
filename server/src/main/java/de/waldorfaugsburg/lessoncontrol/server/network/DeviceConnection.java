@@ -22,7 +22,7 @@ public final class DeviceConnection extends Connection {
 
     public void deny(final DenyPacket.Reason reason, final String message) {
         final String hostString = getRemoteAddressTCP().getHostString();
-        sendTCP(new DenyPacket(DenyPacket.Reason.OUTDATED_CLIENT, message));
+        sendTCP(new DenyPacket(reason, message));
         close();
         log.info("Denied '{}' due to '{}' ({})", hostString, reason, message);
     }

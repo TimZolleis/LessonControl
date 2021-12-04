@@ -4,7 +4,6 @@ import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import de.waldorfaugsburg.lessoncontrol.client.LessonControlClientApplication;
-import de.waldorfaugsburg.lessoncontrol.client.util.SystemResourcesUtil;
 import de.waldorfaugsburg.lessoncontrol.common.network.Network;
 import de.waldorfaugsburg.lessoncontrol.common.network.Packet;
 import de.waldorfaugsburg.lessoncontrol.common.network.PacketDistributor;
@@ -25,7 +24,7 @@ public final class NetworkClient {
 
     private final PacketDistributor<Connection> distributor = new PacketDistributor<>();
 
-    private NetworkState state;
+    private NetworkState state = NetworkState.UNINITIALIZED;
     private String lastAddress;
 
     public NetworkClient(final LessonControlClientApplication application) {
@@ -36,9 +35,6 @@ public final class NetworkClient {
         Network.registerPacketClasses(client);
         client.addListener(new ClientListener());
         client.start();
-
-        // Transmit system-resources
-        Scheduler.schedule(new SystemResourceTransmissionRunnable(this), 10000);
 
         // Registering internal receivers
         registerReceivers();
@@ -106,19 +102,20 @@ public final class NetworkClient {
             }
         });
 
-        application.getEventDistributor().addListener(NetworkListener.class, state -> log.info("Network state is now '{}'", state));
+        application.getEventDistributor().addListener(NetworkListener.class, (previousState, state) -> log.info("Network state is now '{}'", state));
     }
 
     private void changeState(final NetworkState state) {
+        final NetworkState previousState = this.state;
         this.state = state;
-        application.getEventDistributor().call(NetworkListener.class, listener -> listener.onStateChange(state));
+        application.getEventDistributor().call(NetworkListener.class, listener -> listener.onStateChange(previousState, state));
     }
 
     private final class ClientListener implements Listener {
 
         @Override
         public void connected(final Connection connection) {
-            client.sendTCP(new RegisterPacket(application.getMachineName(), Network.PROTOCOL_VERSION, SystemResourcesUtil.getTotalMemory()));
+            client.sendTCP(new RegisterPacket(application.getMachineName(), Network.PROTOCOL_VERSION));
             lastAddress = client.getRemoteAddressTCP().getHostString();
             changeState(NetworkState.CONNECTED);
         }

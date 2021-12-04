@@ -11,5 +11,4 @@ import lombok.NoArgsConstructor;
 public final class RegisterPacket extends Packet {
     private String name;
     private int protocolVersion;
-    private long totalMemory;
 }

@@ -9,10 +9,7 @@ import de.waldorfaugsburg.lessoncontrol.common.network.server.AcceptPacket;
 import de.waldorfaugsburg.lessoncontrol.common.network.server.DenyPacket;
 import de.waldorfaugsburg.lessoncontrol.common.network.server.TransferFileChunkPacket;
 import de.waldorfaugsburg.lessoncontrol.common.network.server.TransferProfilePacket;
-import de.waldorfaugsburg.lessoncontrol.common.service.AbstractServiceConfiguration;
-import de.waldorfaugsburg.lessoncontrol.common.service.ButtonServiceConfiguration;
-import de.waldorfaugsburg.lessoncontrol.common.service.OBSServiceConfiguration;
-import de.waldorfaugsburg.lessoncontrol.common.service.VoicemeeterServiceConfiguration;
+import de.waldorfaugsburg.lessoncontrol.common.service.*;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -49,6 +46,7 @@ public final class Network {
         kryo.register(OBSServiceConfiguration.class);
         kryo.register(OBSServiceConfiguration.MonitoredCamera.class);
         kryo.register(OBSServiceConfiguration.SourceVisibility.class);
+        kryo.register(BBBServiceConfiguration.class);
 
         // Bound to client
         kryo.register(RegisterPacket.class);

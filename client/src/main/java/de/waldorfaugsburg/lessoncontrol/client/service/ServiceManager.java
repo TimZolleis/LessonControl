@@ -5,14 +5,12 @@ import de.waldorfaugsburg.lessoncontrol.client.network.NetworkClient;
 import de.waldorfaugsburg.lessoncontrol.client.network.NetworkListener;
 import de.waldorfaugsburg.lessoncontrol.client.network.NetworkState;
 import de.waldorfaugsburg.lessoncontrol.client.profile.FileTransferListener;
+import de.waldorfaugsburg.lessoncontrol.client.service.bbb.BBBService;
 import de.waldorfaugsburg.lessoncontrol.client.service.button.ButtonService;
 import de.waldorfaugsburg.lessoncontrol.client.service.obs.OBSService;
 import de.waldorfaugsburg.lessoncontrol.client.service.voicemeeter.VoicemeeterService;
 import de.waldorfaugsburg.lessoncontrol.common.network.server.TransferProfilePacket;
-import de.waldorfaugsburg.lessoncontrol.common.service.AbstractServiceConfiguration;
-import de.waldorfaugsburg.lessoncontrol.common.service.ButtonServiceConfiguration;
-import de.waldorfaugsburg.lessoncontrol.common.service.OBSServiceConfiguration;
-import de.waldorfaugsburg.lessoncontrol.common.service.VoicemeeterServiceConfiguration;
+import de.waldorfaugsburg.lessoncontrol.common.service.*;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.HashMap;
@@ -34,6 +32,7 @@ public final class ServiceManager {
         ServiceFunctionRegistry.registerService(VoicemeeterServiceConfiguration.class, config -> new VoicemeeterService(application, config));
         ServiceFunctionRegistry.registerService(ButtonServiceConfiguration.class, config -> new ButtonService(application, config));
         ServiceFunctionRegistry.registerService(OBSServiceConfiguration.class, config -> new OBSService(application, config));
+        ServiceFunctionRegistry.registerService(BBBServiceConfiguration.class, config -> new BBBService(application, config));
 
         registerListeners();
     }

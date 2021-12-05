@@ -47,6 +47,7 @@ public final class VoicemeeterService extends AbstractService<VoicemeeterService
             Thread.sleep(6000);
         } catch (final InterruptedException ignored) {
         }
+
         Voicemeeter.init();
         loadConfig();
         setAntiHowlEnabled(getConfiguration().getAntiHowl().isEnabled());
@@ -79,7 +80,7 @@ public final class VoicemeeterService extends AbstractService<VoicemeeterService
                         }
                     }
 
-                    // Only consider rendering when theres change
+                    // Only consider rendering when there's change
                     if (previousState != antiHowlBlocking) {
                         antiHowlListeners.forEach(l -> l.accept(antiHowlBlocking));
                     }
@@ -107,7 +108,7 @@ public final class VoicemeeterService extends AbstractService<VoicemeeterService
                     }
                 }
 
-                // If there's a loudest channel -> mute others; if there's none mute all
+                // If there's one very loud channel -> mute others; if there's none mute all
                 for (final int stripId : getConfiguration().getNoiseReduction().getStrips()) {
                     muteStrip(stripId, loudestStrip == -1 || stripId != loudestStrip);
                 }
@@ -169,7 +170,7 @@ public final class VoicemeeterService extends AbstractService<VoicemeeterService
     private void muteStrip(final int stripId, final boolean muted) {
         final Boolean result = muteMap.put(stripId, muted);
 
-        // Only consider spamming vm when theres change
+        // Only consider spamming vm when there's change
         if (result == null || result != muted) {
             Voicemeeter.setParameterFloat("Strip(" + stripId + ").Mute", muted ? 1 : 0);
             stripMuteListeners.get(stripId).forEach(consumer -> consumer.accept(muted));

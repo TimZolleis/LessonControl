@@ -9,6 +9,7 @@ import java.io.IOException;
 public final class CommandExecutionUtil {
 
     private CommandExecutionUtil() {
+
     }
 
     public static void run(final String... args) {
@@ -21,9 +22,18 @@ public final class CommandExecutionUtil {
             if (workingDirectory != null) {
                 builder.directory(workingDirectory);
             }
-            builder.start();
-        } catch (final IOException e) {
-            log.error("An error occured running command", e);
+            final Process process = builder.start();
+            final String command = process.info().command().orElse(null);
+            if (command != null) {
+                log.info("Started sub-process with PID {} ({})", process.pid(), command);
+            }
+
+            // Wait for process to terminate
+            process.waitFor();
+
+            log.info("Sub-process with PID {} exited with {}", process.pid(), process.exitValue());
+        } catch (final IOException | InterruptedException e) {
+            log.error("An error occurred running command", e);
         }
     }
 }

@@ -38,6 +38,15 @@ public final class ServiceManager {
         registerListeners();
     }
 
+    private void registerListeners() {
+        final NetworkClient networkClient = application.getNetworkClient();
+        networkClient.getDistributor().addListener(TransferProfilePacket.class, (connection, packet) -> this.configurations = packet.getServiceConfigurations());
+        application.getEventDistributor().addListener(FileTransferListener.class, this::enableServices);
+        application.getEventDistributor().addListener(NetworkListener.class, (previousState, state) -> {
+            if (state == NetworkState.CONNECTING) disableServices(false);
+        });
+    }
+
     public void disableServices(final boolean shutdown) {
         for (final AbstractService<?> service : serviceMap.values()) {
             try {
@@ -50,16 +59,7 @@ public final class ServiceManager {
         serviceMap.clear();
     }
 
-    private void registerListeners() {
-        final NetworkClient networkClient = application.getNetworkClient();
-        networkClient.getDistributor().addListener(TransferProfilePacket.class, (connection, packet) -> this.configurations = packet.getServiceConfigurations());
-        application.getEventDistributor().addListener(FileTransferListener.class, this::initializeServices);
-        application.getEventDistributor().addListener(NetworkListener.class, (previousState, state) -> {
-            if (state == NetworkState.CONNECTING) disableServices(false);
-        });
-    }
-
-    private void initializeServices() {
+    private void enableServices() {
         disableServices(false);
 
         for (final AbstractServiceConfiguration configuration : configurations) {

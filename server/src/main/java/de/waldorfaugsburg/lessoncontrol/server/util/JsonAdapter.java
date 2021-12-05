@@ -1,11 +1,13 @@
 package de.waldorfaugsburg.lessoncontrol.server.util;
 
 import com.google.gson.*;
+import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
 
+@Slf4j
 public final class JsonAdapter<T> implements JsonSerializer<T>, JsonDeserializer<T> {
 
     private final Map<String, Class<?>> classMap = new HashMap<>();
@@ -25,7 +27,7 @@ public final class JsonAdapter<T> implements JsonSerializer<T>, JsonDeserializer
             try {
                 return Class.forName(c);
             } catch (final ClassNotFoundException e) {
-                e.printStackTrace();
+                log.error("An error occurred while looking for class {}", c, e);
             }
             return null;
         }));

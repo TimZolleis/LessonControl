@@ -50,10 +50,6 @@ public final class OBSService extends AbstractService<OBSServiceConfiguration> {
 
     private void restart() {
         stop();
-        try {
-            Thread.sleep(1000);
-        } catch (final InterruptedException ignored) {
-        }
         start();
     }
 
@@ -68,14 +64,14 @@ public final class OBSService extends AbstractService<OBSServiceConfiguration> {
         // Initialize OBS websocket
         controller = new OBSRemoteController("ws://localhost:4444", false);
         controller.registerConnectCallback(response -> checkSourceVisibility());
-        controller.registerDisconnectCallback(() -> {
-            // If we disconnect we want to kill OBS
-            CommandExecutionUtil.run("taskkill", "/F", "/T", "/IM", "obs64.exe");
-        });
     }
 
     private void stop() {
+        // Disconnecting websocket
         controller.disconnect();
+
+        // Killing process
+        CommandExecutionUtil.run("taskkill", "/F", "/T", "/IM", "obs64.exe");
     }
 
     private void checkSourceVisibility() {

@@ -54,6 +54,13 @@
         </plugins>
     </build>
 
+    <repositories>
+        <repository>
+            <id>sonatype</id>
+            <url>https://oss.sonatype.org/content/groups/public/</url>
+        </repository>
+    </repositories>
+
     <dependencies>
         <dependency>
             <groupId>de.waldorfaugsburg.lessoncontrol</groupId>
@@ -68,7 +75,7 @@
         <dependency>
             <groupId>net.twasi</groupId>
             <artifactId>obs-websocket-java</artifactId>
-            <version>1.2.0</version>
+            <version>1.3.0-SNAPSHOT</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.slf4j</groupId>

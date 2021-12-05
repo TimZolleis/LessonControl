@@ -13,7 +13,7 @@ public final class DenyPacket extends Packet {
     private String message;
 
     public enum Reason {
-        OUTDATED_CLIENT,
+        INVALID_PROTOCOL,
         UNKNOWN_DEVICE
     }
 }

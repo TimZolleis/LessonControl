@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
 
 @Slf4j
@@ -62,7 +61,7 @@ public final class NetworkServer {
     private void registerReceivers() {
         distributor.addListener(RegisterPacket.class, (connection, packet) -> {
             if (packet.getProtocolVersion() != Network.PROTOCOL_VERSION) {
-                connection.deny(DenyPacket.Reason.OUTDATED_CLIENT, "Required protocol-version is " + Network.PROTOCOL_VERSION);
+                connection.deny(DenyPacket.Reason.INVALID_PROTOCOL, "Required protocol-version is " + Network.PROTOCOL_VERSION + " but yours is " + packet.getProtocolVersion());
                 return;
             }
 
@@ -91,8 +90,7 @@ public final class NetworkServer {
         @Override
         public void received(final Connection connection, final Object object) {
             final DeviceConnection client = (DeviceConnection) connection;
-            if (object instanceof Packet) {
-                final Packet packet = (Packet) object;
+            if (object instanceof final Packet packet) {
                 distributor.distribute(client, packet);
             }
         }

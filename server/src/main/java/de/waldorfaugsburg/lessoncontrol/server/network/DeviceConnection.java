@@ -4,8 +4,6 @@ import com.esotericsoftware.kryonet.Connection;
 import de.waldorfaugsburg.lessoncontrol.common.network.server.AcceptPacket;
 import de.waldorfaugsburg.lessoncontrol.common.network.server.DenyPacket;
 import de.waldorfaugsburg.lessoncontrol.server.device.Device;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j

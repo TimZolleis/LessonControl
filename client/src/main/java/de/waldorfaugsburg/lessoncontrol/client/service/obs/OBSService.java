@@ -50,6 +50,10 @@ public final class OBSService extends AbstractService<OBSServiceConfiguration> {
 
     private void restart() {
         stop();
+        try {
+            Thread.sleep(2000);
+        } catch (final InterruptedException ignored) {
+        }
         start();
     }
 

@@ -27,12 +27,7 @@ public final class CommandExecutionUtil {
             if (command != null) {
                 log.info("Started sub-process with PID {} ({})", process.pid(), command);
             }
-
-            // Wait for process to terminate
-            process.waitFor();
-
-            log.info("Sub-process with PID {} exited with {}", process.pid(), process.exitValue());
-        } catch (final IOException | InterruptedException e) {
+        } catch (final IOException e) {
             log.error("An error occurred running command", e);
         }
     }

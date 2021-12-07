@@ -29,12 +29,12 @@ public final class BBBService extends AbstractService<BBBServiceConfiguration> {
             driver -> ((JavascriptExecutor) driver).executeScript("return document.readyState").equals("complete");
 
     private static final String URL = "https://app.bildungsplattform.org/";
+    private static final String LOGOUT_URL = URL + "logout";
     private static final Function<String, String> SELECT_PERSON_URL_FUNCTION = person -> URL + "user/select_person?_switch_user=" + person;
     private static final Function<String, String> COURSE_URL_FUNCTION = courseId -> URL + "courses/" + courseId;
     private static final Function<String, String> BBB_STOP_FUNCTION = courseId -> COURSE_URL_FUNCTION.apply(courseId) + "/bbb?status=stopped";
 
     private WebDriver webDriver;
-    private long lastAction;
 
     private BBBServiceConfiguration.BBBSession currentSession;
 
@@ -56,7 +56,6 @@ public final class BBBService extends AbstractService<BBBServiceConfiguration> {
 
         webDriver = new ChromeDriver(options);
         webDriver.manage().window().minimize();
-        login();
 
         getApplication().getEventDistributor().call(BBBListener.class, listener -> listener.onSessionsReceived(getConfiguration().getSessions()));
     }
@@ -70,15 +69,15 @@ public final class BBBService extends AbstractService<BBBServiceConfiguration> {
     }
 
     public void startSession(final BBBServiceConfiguration.BBBSession session) {
-        // Ensure login
-        login();
-
         if (currentSession != null) {
             stopCurrentSession();
 
             // Deselect previous person
             webDriver.get(SELECT_PERSON_URL_FUNCTION.apply("_exit"));
             waitUntilPageReady();
+        } else {
+            // Ensure login
+            login();
         }
 
         // Select new person
@@ -184,18 +183,14 @@ public final class BBBService extends AbstractService<BBBServiceConfiguration> {
         webDriver.get(SELECT_PERSON_URL_FUNCTION.apply("_exit"));
         waitUntilPageReady();
 
+        webDriver.get(LOGOUT_URL);
+        waitUntilPageReady();
+
         currentSession = null;
         getApplication().getEventDistributor().call(BBBListener.class, BBBListener::onSessionStop);
     }
 
     private void login() {
-        final long lastActionPerformed = lastAction;
-
-        // If there's been recent action; session is still valid and hasn't to be checked
-        if (System.currentTimeMillis() - lastActionPerformed < TimeUnit.HOURS.toMillis(1)) {
-            return;
-        }
-
         webDriver.get(URL);
         waitUntilPageReady();
 
@@ -225,7 +220,6 @@ public final class BBBService extends AbstractService<BBBServiceConfiguration> {
             return;
         }
 
-        lastAction = System.currentTimeMillis();
         log.info("Successfully logged-in as '{}' for BBB", getConfiguration().getEmail());
     }
 

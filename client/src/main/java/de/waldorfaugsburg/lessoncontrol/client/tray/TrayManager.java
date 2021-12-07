@@ -74,7 +74,7 @@ public final class TrayManager {
                 bbbMenu.removeAll();
                 final BBBService service = application.getServiceManager().getService(BBBService.class);
                 sessions.forEach(session -> bbbMenu.add(createItem(session.getName(), e -> service.startSession(session))));
-                bbbMenu.add(createItem("Beenden", e -> service.stopCurrentSession()));
+                bbbMenu.add(createItem("Konferenz beenden", e -> service.stopCurrentSession()));
             }
 
             @Override

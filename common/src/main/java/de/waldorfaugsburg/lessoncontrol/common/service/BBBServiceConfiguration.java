@@ -15,4 +15,17 @@ public final class BBBServiceConfiguration extends AbstractServiceConfiguration 
     private String email;
     private String password;
 
+    private Set<BBBSession> sessions;
+
+    @NoArgsConstructor
+    @Getter
+    public static final class BBBSession {
+        private String name;
+        private String teacherEmail;
+        private String courseId;
+
+        private int participantCount;
+        private int duration;
+    }
+
 }

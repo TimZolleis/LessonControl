@@ -16,7 +16,7 @@ import java.util.Set;
 
 public final class Network {
 
-    public static final int PROTOCOL_VERSION = 4;
+    public static final int PROTOCOL_VERSION = 5;
     public static final int FILE_CHUNK_SIZE = 1024;
 
     static {
@@ -47,6 +47,7 @@ public final class Network {
         kryo.register(OBSServiceConfiguration.MonitoredCamera.class);
         kryo.register(OBSServiceConfiguration.SourceVisibility.class);
         kryo.register(BBBServiceConfiguration.class);
+        kryo.register(BBBServiceConfiguration.BBBSession.class);
 
         // Bound to client
         kryo.register(RegisterPacket.class);

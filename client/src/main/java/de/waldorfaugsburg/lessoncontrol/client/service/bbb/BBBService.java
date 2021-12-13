@@ -164,6 +164,7 @@ public final class BBBService extends AbstractService<BBBServiceConfiguration> {
 
         currentSession = session;
         getApplication().getEventDistributor().call(BBBListener.class, listener -> listener.onSessionStart(session));
+        log.info("Successfully started session in course '{}' by '{}'", getConfiguration().getEmail());
     }
 
     public void stopCurrentSession() {
@@ -236,6 +237,6 @@ public final class BBBService extends AbstractService<BBBServiceConfiguration> {
     }
 
     private WebDriverWait createWait() {
-        return new WebDriverWait(webDriver, Duration.ofSeconds(10));
+        return new WebDriverWait(webDriver, Duration.ofSeconds(30));
     }
 }

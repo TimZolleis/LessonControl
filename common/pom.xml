@@ -6,15 +6,15 @@
     <parent>
         <groupId>de.waldorfaugsburg.lessoncontrol</groupId>
         <artifactId>lessoncontrol</artifactId>
-        <version>1.0</version>
+        <version>b131221</version>
     </parent>
 
     <artifactId>common</artifactId>
-    <version>1.0</version>
+    <version>b131221</version>
 
     <properties>
-        <maven.compiler.source>16</maven.compiler.source>
-        <maven.compiler.target>16</maven.compiler.target>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
     </properties>
 
     <dependencies>

@@ -7,7 +7,7 @@
     <groupId>de.waldorfaugsburg.lessoncontrol</groupId>
     <artifactId>lessoncontrol</artifactId>
     <packaging>pom</packaging>
-    <version>b131221</version>
+    <version>b151221</version>
     <modules>
         <module>client</module>
         <module>server</module>
@@ -41,7 +41,7 @@
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>30.1.1-jre</version>
+            <version>31.0.1-jre</version>
         </dependency>
 
         <dependency>

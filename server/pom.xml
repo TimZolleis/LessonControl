@@ -6,15 +6,16 @@
     <parent>
         <groupId>de.waldorfaugsburg.lessoncontrol</groupId>
         <artifactId>lessoncontrol</artifactId>
-        <version>b131221</version>
+        <version>b151221</version>
     </parent>
 
     <artifactId>server</artifactId>
-    <version>b131221</version>
+    <version>b151221</version>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
+        <log4j2.version>2.16.0</log4j2.version>
     </properties>
 
     <build>
@@ -70,41 +71,6 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-log4j2</artifactId>
-            <!-- DUE TO VULNERABILITIES IN LOG4J -->
-            <exclusions>
-                <exclusion>
-                    <groupId>org.apache.logging.log4j</groupId>
-                    <artifactId>log4j-slf4j-impl</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.logging.log4j</groupId>
-                    <artifactId>log4j-core</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.logging.log4j</groupId>
-                    <artifactId>log4j-jul</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
-        <!-- DUE TO VULNERABILITIES IN LOG4J -->
-        <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-slf4j-impl</artifactId>
-            <version>2.15.0</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-core</artifactId>
-            <version>2.15.0</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-jul</artifactId>
-            <version>2.15.0</version>
-            <scope>compile</scope>
         </dependency>
     </dependencies>
 

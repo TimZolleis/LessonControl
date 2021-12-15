@@ -6,11 +6,11 @@
     <parent>
         <groupId>de.waldorfaugsburg.lessoncontrol</groupId>
         <artifactId>lessoncontrol</artifactId>
-        <version>b131221</version>
+        <version>b151221</version>
     </parent>
 
     <artifactId>client</artifactId>
-    <version>b131221</version>
+    <version>b151221</version>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
@@ -92,23 +92,23 @@
         <dependency>
             <groupId>org.seleniumhq.selenium</groupId>
             <artifactId>selenium-java</artifactId>
-            <version>4.0.0</version>
+            <version>4.1.0</version>
         </dependency>
         <dependency>
             <groupId>org.seleniumhq.selenium</groupId>
             <artifactId>selenium-chrome-driver</artifactId>
-            <version>4.0.0</version>
+            <version>4.1.0</version>
         </dependency>
 
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-core</artifactId>
-            <version>2.15.0</version>
+            <version>2.16.0</version>
         </dependency>
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-slf4j-impl</artifactId>
-            <version>2.15.0</version>
+            <version>2.16.0</version>
         </dependency>
     </dependencies>
 

@@ -3,6 +3,7 @@ package de.waldorfaugsburg.lessoncontrol.server.device;
 import de.waldorfaugsburg.lessoncontrol.common.network.Network;
 import de.waldorfaugsburg.lessoncontrol.common.network.client.RegisterPacket;
 import de.waldorfaugsburg.lessoncontrol.server.config.DeviceConfiguration;
+import de.waldorfaugsburg.lessoncontrol.server.config.ServerConfiguration;
 import de.waldorfaugsburg.lessoncontrol.server.network.DeviceConnection;
 import lombok.extern.slf4j.Slf4j;
 
@@ -17,16 +18,16 @@ import java.util.zip.ZipOutputStream;
 @Slf4j
 public final class Device {
 
-    private final DeviceConfiguration configuration;
-    private final DeviceConfiguration.DeviceInfo info;
+    private final ServerConfiguration serverConfiguration;
+    private final DeviceConfiguration deviceConfiguration;
 
     private DeviceConnection connection;
     private long connectedAt;
     private byte[][] dataChunks;
 
-    public Device(final DeviceConfiguration configuration, final DeviceConfiguration.DeviceInfo info) {
-        this.configuration = configuration;
-        this.info = info;
+    public Device(final ServerConfiguration serverConfiguration, final DeviceConfiguration deviceConfiguration) {
+        this.serverConfiguration = serverConfiguration;
+        this.deviceConfiguration = deviceConfiguration;
         convertAndCacheFiles();
     }
 
@@ -47,8 +48,8 @@ public final class Device {
             byte[] buffer = new byte[1024];
             final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             final ZipOutputStream stream = new ZipOutputStream(byteArrayOutputStream);
-            for (final Map.Entry<String, String> entry : info.getFiles().entrySet()) {
-                final File file = new File(configuration.getFilesFolder() + entry.getKey());
+            for (final Map.Entry<String, String> entry : deviceConfiguration.getFiles().entrySet()) {
+                final File file = new File(serverConfiguration.getFilesFolder() + entry.getKey());
                 writeFilesRecursively(file, entry.getValue(), buffer, stream);
             }
             stream.close();
@@ -101,11 +102,11 @@ public final class Device {
     }
 
     public String getName() {
-        return info.getName();
+        return deviceConfiguration.getName();
     }
 
-    public DeviceConfiguration.DeviceInfo getInfo() {
-        return info;
+    public DeviceConfiguration getConfiguration() {
+        return deviceConfiguration;
     }
 
     public DeviceConnection getConnection() {

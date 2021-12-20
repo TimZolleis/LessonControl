@@ -7,12 +7,14 @@ import de.waldorfaugsburg.lessoncontrol.common.network.server.DenyPacket;
 import de.waldorfaugsburg.lessoncontrol.common.network.server.TransferFileChunkPacket;
 import de.waldorfaugsburg.lessoncontrol.common.network.server.TransferProfilePacket;
 import de.waldorfaugsburg.lessoncontrol.server.config.DeviceConfiguration;
+import de.waldorfaugsburg.lessoncontrol.server.config.ServerConfiguration;
 import de.waldorfaugsburg.lessoncontrol.server.network.NetworkListener;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Collection;
@@ -24,30 +26,34 @@ import java.util.Map;
 public final class DeviceService {
 
     private final Gson gson;
+    private final ServerConfiguration configuration;
     private final EventDistributor eventDistributor;
     private final Map<String, Device> deviceMap = new HashMap<>();
 
-    private DeviceConfiguration configuration;
-
-    public DeviceService(final Gson gson, final EventDistributor eventDistributor) {
+    public DeviceService(final Gson gson, final ServerConfiguration configuration, final EventDistributor eventDistributor) {
         this.gson = gson;
+        this.configuration = configuration;
         this.eventDistributor = eventDistributor;
     }
 
     @PostConstruct
     private void loadFromConfiguration() {
-        // Parse 'devices.json'
-        try (final JsonReader reader = new JsonReader(new BufferedReader(new FileReader("devices.json")))) {
-            configuration = gson.fromJson(reader, DeviceConfiguration.class);
-        } catch (final IOException e) {
-            log.error("An error occurred while reading devices", e);
-        }
+        final File devicesFolder = new File(configuration.getDevicesFolder());
+        final File[] deviceConfigurationFiles = devicesFolder.listFiles();
+        if (deviceConfigurationFiles == null) return;
 
-        // Create devices from infos
         deviceMap.clear();
-        for (final DeviceConfiguration.DeviceInfo info : configuration.getDevices()) {
-            deviceMap.put(info.getName(), new Device(configuration, info));
-            log.info("Registered device '{}'", info.getName());
+
+        for (final File file : deviceConfigurationFiles) {
+            if (!file.getName().endsWith(".json")) continue;
+
+            try (final JsonReader reader = new JsonReader(new BufferedReader(new FileReader(file)))) {
+                final DeviceConfiguration deviceConfiguration = gson.fromJson(reader, DeviceConfiguration.class);
+                deviceMap.put(deviceConfiguration.getName(), new Device(configuration, deviceConfiguration));
+                log.info("Registered device '{}'", deviceConfiguration.getName());
+            } catch (final IOException e) {
+                log.error("An error occurred while reading '{}'", file.getName(), e);
+            }
         }
 
         // Add network event listener
@@ -65,7 +71,7 @@ public final class DeviceService {
 
             // Transfer device data
             final int chunkCount = device.getDataChunks().length;
-            device.getConnection().sendTCP(new TransferProfilePacket(device.getInfo().getConfigurations(), chunkCount));
+            device.getConnection().sendTCP(new TransferProfilePacket(device.getConfiguration().getServices(), chunkCount));
             for (final byte[] chunk : device.getDataChunks()) {
                 device.getConnection().sendTCP(new TransferFileChunkPacket(chunk));
                 busyWaitMicros(50);

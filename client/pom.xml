@@ -18,7 +18,7 @@
     </properties>
 
     <build>
-        <finalName>lessoncontrol-client-${project.parent.version}</finalName>
+        <finalName>lessoncontrol-client-${project.version}</finalName>
         <resources>
             <resource>
                 <directory>src/main/resources</directory>
@@ -65,7 +65,7 @@
         <dependency>
             <groupId>de.waldorfaugsburg.lessoncontrol</groupId>
             <artifactId>common</artifactId>
-            <version>${project.version}</version>
+            <version>b151221</version>
         </dependency>
         <dependency>
             <groupId>com.github.oshi</groupId>

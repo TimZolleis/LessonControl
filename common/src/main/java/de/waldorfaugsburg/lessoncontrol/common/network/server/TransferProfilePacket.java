@@ -12,6 +12,6 @@ import java.util.Set;
 @AllArgsConstructor
 @Getter
 public final class TransferProfilePacket extends Packet {
-    private Set<AbstractServiceConfiguration> serviceConfigurations;
+    private Set<AbstractServiceConfiguration> services;
     private int fileChunkCount;
 }

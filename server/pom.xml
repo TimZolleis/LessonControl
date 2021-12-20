@@ -10,7 +10,7 @@
     </parent>
 
     <artifactId>server</artifactId>
-    <version>b151221</version>
+    <version>b181221</version>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
@@ -19,7 +19,7 @@
     </properties>
 
     <build>
-        <finalName>lessoncontrol-server-${project.parent.version}</finalName>
+        <finalName>lessoncontrol-server-${project.version}</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
@@ -55,7 +55,7 @@
         <dependency>
             <groupId>de.waldorfaugsburg.lessoncontrol</groupId>
             <artifactId>common</artifactId>
-            <version>${project.version}</version>
+            <version>b151221</version>
         </dependency>
 
         <dependency>
